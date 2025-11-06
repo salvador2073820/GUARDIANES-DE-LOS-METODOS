@@ -1,0 +1,31 @@
+guardianes_metodos/
+│
+├── main.py
+├── assets/
+│   ├── sprites/
+│   ├── music/
+│   ├── backgrounds/
+│
+├── worlds/
+│   ├── mundo1.py
+│   ├── mundo2.py
+│   ├── mundo3.py
+│   ├── mundo4.py
+│
+├── methods/
+│   ├── biseccion.py
+│   ├── newton_raphson.py
+│   ├── gauss_seidel.py
+│   └── ...
+│
+└── data/
+    └── problemas.json
+
+
+
+--------------------------------------------------------
+
+main.py = Menú principal, control general.
+worlds/ = Niveles y desafíos.
+methods/ = Implementaciones de los métodos numéricos.
+data/ = Banco de ejercicios (JSON con enunciado, variables, solución esperada).
