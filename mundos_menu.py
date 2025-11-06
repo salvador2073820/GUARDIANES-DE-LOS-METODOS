@@ -4,6 +4,15 @@ from utils.colores import *
 pygame.font.init()
 clock = pygame.time.Clock()
 
+# --- MÚSICA DE FONDO ---
+pygame.mixer.init()
+try:
+    pygame.mixer.music.load("assets/music/medieval_theme.mp3")
+    pygame.mixer.music.set_volume(0.5)
+    pygame.mixer.music.play(-1)  # Se repite infinitamente
+except:
+    print("⚠️ Música no encontrada, asegúrate de colocarla en assets/music/")
+
 # Fuentes
 fuente_titulo = pygame.font.SysFont("Garamond", 90, bold=True)
 fuente_mundo = pygame.font.SysFont("Garamond", 26, bold=True)
