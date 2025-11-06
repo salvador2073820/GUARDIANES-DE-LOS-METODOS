@@ -1,31 +1,56 @@
 guardianes_metodos/
 │
-├── main.py
+├── main.py                            ← Menú principal (Jugar / Créditos / Salir)
+├── mundos_menu.py                     ← Mapa de mundos (Numéria)
+│
+├── unidades/                          ← Carpeta con las 4 unidades temáticas
+│   ├── __init__.py
+│   │
+│   ├── unidad1_interpolacion/         ← Unidad Temática I
+│   │   ├── __init__.py
+│   │   ├── niveles_menu.py            ← Menú de niveles de esta unidad
+│   │   ├── nivel1.py
+│   │   ├── nivel2.py
+│   │   ├── nivel3.py
+│   │   ├── nivel4.py
+│   │   ├── nivel5.py
+│   │   ├── nivel6.py
+│   │   ├── nivel7.py
+│   │   ├── nivel8.py
+│   │   ├── nivel9.py
+│   │   └── nivel10.py
+│   │
+│   ├── unidad2_ecuaciones/            ← Unidad Temática II
+│   │   ├── __init__.py
+│   │   ├── niveles_menu.py
+│   │   ├── nivel1.py
+│   │   ├── nivel2.py
+│   │   ├── ...
+│   │   └── nivelN.py
+│   │
+│   ├── unidad3_integracion/           ← Unidad Temática III
+│   │   ├── __init__.py
+│   │   ├── niveles_menu.py
+│   │   ├── nivel1.py
+│   │   ├── nivel2.py
+│   │   └── ...
+│   │
+│   └── unidad4_diferenciales/         ← Unidad Temática IV
+│       ├── __init__.py
+│       ├── niveles_menu.py
+│       ├── nivel1.py
+│       ├── nivel2.py
+│       └── ...
+│
+├── utils/
+│   ├── colores.py                     ← Paleta de colores general
+│   ├── botones.py                     ← Clase genérica de botones
+│   └── funciones_comunes.py           ← Transiciones, partículas, etc.
+│
 ├── assets/
-│   ├── sprites/
-│   ├── music/
-│   ├── backgrounds/
+│   ├── images/                        ← Íconos, sprites, fondos, etc.
+│   ├── music/                         ← Música de fondo de cada mundo
+│   └── fonts/                         ← Fuentes personalizadas
 │
-├── worlds/
-│   ├── mundo1.py
-│   ├── mundo2.py
-│   ├── mundo3.py
-│   ├── mundo4.py
-│
-├── methods/
-│   ├── biseccion.py
-│   ├── newton_raphson.py
-│   ├── gauss_seidel.py
-│   └── ...
-│
-└── data/
-    └── problemas.json
-
-
-
---------------------------------------------------------
-
-main.py = Menú principal, control general.
-worlds/ = Niveles y desafíos.
-methods/ = Implementaciones de los métodos numéricos.
-data/ = Banco de ejercicios (JSON con enunciado, variables, solución esperada).
+└── saves/
+    └── progreso.json                  ← Guarda el avance del jugador

@@ -1,0 +1,17 @@
+{
+  "unidad1": {
+    "nivel1": {"completado": false},
+    "nivel2": {"completado": false},
+    "nivel3": {"completado": false},
+    "nivel4": {"completado": false},
+    "nivel5": {"completado": false},
+    "nivel6": {"completado": false},
+    "nivel7": {"completado": false},
+    "nivel8": {"completado": false},
+    "nivel9": {"completado": false},
+    "nivel10": {"completado": false}
+  },
+  "unidad2": {},
+  "unidad3": {},
+  "unidad4": {}
+}
