@@ -1,6 +1,18 @@
 import pygame, sys
 from utils.colores import *
 
+# --- Importar niveles del Mundo 3 ---
+from unidades.unidad3.nivel1 import nivel1
+from unidades.unidad3.nivel2 import nivel2
+from unidades.unidad3.nivel3 import nivel3
+from unidades.unidad3.nivel4 import nivel4
+from unidades.unidad3.nivel5 import nivel5
+from unidades.unidad3.nivel6 import nivel6
+from unidades.unidad3.nivel7 import nivel7
+from unidades.unidad3.nivel8 import nivel8
+from unidades.unidad3.nivel9 import nivel9
+from unidades.unidad3.nivel10 import nivel10
+
 pygame.init()
 
 # --- Clase Boton ---
@@ -35,48 +47,67 @@ def niveles_menu_mundo3(pantalla, ancho, alto):
     fuente_titulo = pygame.font.Font("assets/fonts/Pieces of Eight.ttf", 80)
     fuente_subtitulo = pygame.font.SysFont("Georgia", 44, bold=True)
     fuente_boton = pygame.font.SysFont("Georgia", 28, bold=True)
-
     reloj = pygame.time.Clock()
 
+    # --- Subniveles del Mundo 3 ---
     subniveles = [
-        "R 3/8 Simpson",
-        "Newton-Cotes Cerradas",
-        "Regla Trapezoidal",
-        "NewtonCortes AyC",
-        "Integración",
-        "1/3 Simpson"
+        "Línea recta",
+        "Cuadrática",
+        "Cúbica",
+        "Lineal con función",
+        "Cuadrática con función",
+        "Regla trapezoidal",
+        "Regla 1/3 Simpson",
+        "Regla 3/8 Simpson",
+        "Newton-Cotes Abierta",
+        "Newton-Cotes Cerrada"
     ]
 
+    # --- Diccionario de funciones de nivel ---
+    funciones_niveles = {
+        0: nivel1,
+        1: nivel2,
+        2: nivel3,
+        3: nivel4,
+        4: nivel5,
+        5: nivel6,
+        6: nivel7,
+        7: nivel8,
+        8: nivel9,
+        9: nivel10
+    }
+
     # --- Colores ---
-    color_boton = (10, 25, 60)        # azul marino oscuro
-    color_hover = (30, 50, 100)       # azul más claro al pasar mouse
-    color_borde = (180, 140, 90)      # dorado madera
+    color_boton = (10, 25, 60)        # Azul marino oscuro
+    color_hover = (30, 50, 100)       # Azul más claro
+    color_borde = (180, 140, 90)      # Dorado madera
     color_texto = (255, 240, 200)
 
     # --- Fondo ---
     fondo = pygame.image.load("assets/images/fondo2.png").convert()
     fondo = pygame.transform.scale(fondo, (ancho, alto))
 
-    # --- Crear botones en dos columnas (3 y 3) ---
+    # --- Crear botones en dos columnas (5 y 5) ---
     botones = []
-    espacio_y = 75
-    ancho_boton = 500
-    alto_boton = 55
+    espacio_y = 80
+    ancho_boton = 540
+    alto_boton = 65
     inicio_y = 230
 
     for i, nombre in enumerate(subniveles):
-        if i < 3:
-            x = ancho // 2 - 520      # columna izquierda
+        if i < 5:
+            x = ancho // 2 - ancho_boton - 50      # Columna izquierda
             y = inicio_y + i * espacio_y
         else:
-            x = ancho // 2 + 20       # columna derecha
-            y = inicio_y + (i - 3) * espacio_y
+            x = ancho // 2 + 50                    # Columna derecha
+            y = inicio_y + (i - 5) * espacio_y
 
         botones.append(
             Boton(nombre, (x, y), (ancho_boton, alto_boton), fuente_boton,
                   color_boton, color_texto, color_hover, color_borde)
         )
 
+    # --- Bucle principal ---
     while True:
         mouse_pos = pygame.mouse.get_pos()
 
@@ -86,10 +117,10 @@ def niveles_menu_mundo3(pantalla, ancho, alto):
             if evento.type == pygame.KEYDOWN and evento.key == pygame.K_ESCAPE:
                 return
             if evento.type == pygame.MOUSEBUTTONDOWN:
-                for boton in botones:
+                for i, boton in enumerate(botones):
                     if boton.fue_click(mouse_pos):
-                        print(f"Entrando al subnivel: {boton.texto}")
-                        # Aquí se puede llamar a la función específica de cada subnivel
+                        print(f"🧭 Entrando al subnivel {i+1}: {boton.texto}")
+                        funciones_niveles[i](pantalla, ancho, alto)
 
         # --- Fondo ---
         pantalla.blit(fondo, (0, 0))

@@ -1,9 +1,16 @@
 import pygame, sys
 from utils.colores import *
 
+# --- Importar niveles del Mundo 2 ---
+from unidades.unidad2.nivel1 import nivel1
+from unidades.unidad2.nivel2 import nivel2
+from unidades.unidad2.nivel3 import nivel3
+from unidades.unidad2.nivel4 import nivel4
+from unidades.unidad2.nivel5 import nivel5
+
 pygame.init()
 
-# --- Clase Boton ---
+# --- Clase Botón ---
 class Boton:
     def __init__(self, texto, pos, tamaño, fuente, color_fondo, color_texto, color_hover, color_borde):
         self.texto = texto
@@ -58,10 +65,10 @@ def niveles_menu_mundo2(pantalla, ancho, alto):
 
     # --- Crear botones centrados ---
     botones = []
-    espacio_y = 75
-    ancho_boton = 500
-    alto_boton = 55
-    inicio_y = 230
+    espacio_y = 80
+    ancho_boton = 520
+    alto_boton = 60
+    inicio_y = 260
 
     for i, nombre in enumerate(subniveles):
         x = ancho // 2 - ancho_boton // 2
@@ -70,6 +77,15 @@ def niveles_menu_mundo2(pantalla, ancho, alto):
             Boton(nombre, (x, y), (ancho_boton, alto_boton), fuente_boton,
                   color_boton, color_texto, color_hover, color_borde)
         )
+
+    # --- Diccionario de funciones de nivel ---
+    funciones_niveles = {
+        0: nivel1,
+        1: nivel2,
+        2: nivel3,
+        3: nivel4,
+        4: nivel5
+    }
 
     while True:
         mouse_pos = pygame.mouse.get_pos()
@@ -80,10 +96,10 @@ def niveles_menu_mundo2(pantalla, ancho, alto):
             if evento.type == pygame.KEYDOWN and evento.key == pygame.K_ESCAPE:
                 return
             if evento.type == pygame.MOUSEBUTTONDOWN:
-                for boton in botones:
+                for i, boton in enumerate(botones):
                     if boton.fue_click(mouse_pos):
-                        print(f"🧭 Entrando al subnivel: {boton.texto}")
-                        # Aquí puedes llamar a la función específica del subnivel
+                        print(f"🧭 Entrando al subnivel {i+1}: {boton.texto}")
+                        funciones_niveles[i](pantalla, ancho, alto)
 
         # --- Fondo ---
         pantalla.blit(fondo, (0, 0))

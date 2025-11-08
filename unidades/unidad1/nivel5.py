@@ -1,7 +1,7 @@
 # unidades/unidad1/nivel1.py
 import pygame, sys
 
-def nivel3(pantalla, ancho, alto):
+def nivel5(pantalla, ancho, alto):
     fuente = pygame.font.SysFont("Arial", 40)
     reloj = pygame.time.Clock()
     while True:
@@ -12,7 +12,7 @@ def nivel3(pantalla, ancho, alto):
                 return  # Regresa al menú anterior
 
         pantalla.fill((20, 40, 60))
-        texto = fuente.render("Nivel 3 ", True, (255,255,255))
+        texto = fuente.render("Nivel 5", True, (255,255,255))
         pantalla.blit(texto, texto.get_rect(center=(ancho//2, alto//2)))
         pygame.display.flip()
         reloj.tick(60)

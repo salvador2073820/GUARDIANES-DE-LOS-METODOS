@@ -17,7 +17,7 @@ try:
     pygame.mixer.music.set_volume(0.5)
     pygame.mixer.music.play(-1)
 except:
-    print("⚠️ Música no encontrada")
+    print("Música no encontrada")
 
 # Fuentes
 fuente_titulo = pygame.font.Font("assets/fonts/Pieces of Eight.ttf", 90)
@@ -132,7 +132,7 @@ def seleccion_mundo(pantalla, ancho, alto):
             if evento.type == pygame.MOUSEBUTTONDOWN:
                 for m in mundos:
                     if m.fue_click(mouse_pos):
-                        # 🔸 Redirige según el mundo clickeado
+                        # Redirige según el mundo clickeado
                         if m.id_mundo == 1:
                             niveles_menu_mundo1(pantalla, ancho, alto)
                         elif m.id_mundo == 2:
