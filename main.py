@@ -87,7 +87,7 @@ def mostrar_creditos():
         "Emma Vera",
         "Salvador Hernandez",
         "",
-        "Profesora: Dra. Oralia Zamora",
+        "Profesora: Dra. Oralia Zamora Pequeño",
     ]
 
     while ejecutando:

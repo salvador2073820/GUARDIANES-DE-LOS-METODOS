@@ -118,7 +118,7 @@ def niveles_menu_mundo1(pantalla, ancho, alto):
             if evento.type == pygame.MOUSEBUTTONDOWN:
                 for i, boton in enumerate(botones):
                     if boton.fue_click(mouse_pos):
-                        print(f"🧭 Entrando al subnivel {i+1}: {boton.texto}")
+                        print(f" Entrando al subnivel {i+1}: {boton.texto}")
                         funciones_niveles[i](pantalla, ancho, alto)
 
         pantalla.blit(fondo, (0, 0))
