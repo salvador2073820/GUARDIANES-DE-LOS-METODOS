@@ -4,30 +4,25 @@ from utils.colores import *
 
 pygame.init()
 
-# --- CONFIGURACIÓN ---
 ANCHO, ALTO = 1280, 720
 pantalla = pygame.display.set_mode((ANCHO, ALTO))
 pygame.display.set_caption("Guardianes de los Métodos")
 
 clock = pygame.time.Clock()
 
-# --- FUENTES PERSONALIZADAS ---
 fuente_boton = pygame.font.Font("assets/fonts/Pieces of Eight.ttf", 42)
 
-# --- IMÁGENES ---
 fondo = pygame.image.load("assets/images/fondo.png").convert()
 fondo = pygame.transform.scale(fondo, (ANCHO, ALTO))
 
 titulo_img = pygame.image.load("assets/images/titulo.png").convert_alpha()
 titulo_rect = titulo_img.get_rect(center=(ANCHO//2, 180))
 
-# --- COLORES ---
-CAFE = (180, 140, 90)  # mismo color del borde del cuadro de créditos
+CAFE = (180, 140, 90) 
 BLANCO = (255, 255, 255)
 NEGRO = (0, 0, 0)
-BOTON_OSCURO = (25, 25, 40)  # color del interior del cuadro de créditos
+BOTON_OSCURO = (25, 25, 40)  
 
-# --- CLASE BOTÓN ---
 class Boton:
     def __init__(self, texto, x, y, ancho, alto):
         self.texto = texto
@@ -72,7 +67,7 @@ class Boton:
     def fue_click(self, pos_mouse):
         return self.rect.collidepoint(pos_mouse)
 
-# --- FUNCIÓN CRÉDITOS ---
+# --- FUNCIÓN CRÉDITOS
 def mostrar_creditos():
     """Muestra una ventana simple con los créditos."""
     ejecutando = True
