@@ -55,11 +55,11 @@ def niveles_menu_mundo1(pantalla, ancho, alto):
         "Newton hacia atrás",
         "Newton con diferencias divididas",
         "Lagrange",
-        "Falsa posición",
+        "Grafico",
+        "Bisectriz",
         "Punto Fijo",
-        "Secante",
-        "Bisección",
-        "Newton-Raphson"
+        "Newton – Raphson",
+        "Falsa Posición"
     ]
 
     # Colores
