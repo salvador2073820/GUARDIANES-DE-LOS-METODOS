@@ -12,6 +12,7 @@ from unidades.unidad1.nivel7 import nivel7
 from unidades.unidad1.nivel8 import nivel8
 from unidades.unidad1.nivel9 import nivel9
 from unidades.unidad1.nivel10 import nivel10
+from unidades.unidad1.nivel11 import nivel11   # ← AGREGADO
 
 pygame.init()
 
@@ -44,11 +45,13 @@ class Boton:
 
 
 def niveles_menu_mundo1(pantalla, ancho, alto):
+
     fuente_titulo = pygame.font.Font("assets/fonts/Pieces of Eight.ttf", 80)
     fuente_subtitulo = pygame.font.SysFont("Georgia", 44, bold=True)
     fuente_boton = pygame.font.SysFont("Georgia", 28, bold=True)
     reloj = pygame.time.Clock()
 
+    # --- LISTA DE NIVELES (AHORA 11) ---
     subniveles = [
         "Interpolación Lineal",
         "Newton hacia adelante",
@@ -59,7 +62,8 @@ def niveles_menu_mundo1(pantalla, ancho, alto):
         "Bisectriz",
         "Punto Fijo",
         "Newton – Raphson",
-        "Falsa Posición"
+        "Falsa Posición",
+        "Secante"                # ← NIVEL 11
     ]
 
     # Colores
@@ -80,13 +84,14 @@ def niveles_menu_mundo1(pantalla, ancho, alto):
     alto_boton = 55
     inicio_y = 230
 
-    for i in range(10):
-        if i < 5:
+    # --- AHORA 11 BOTONES ---
+    for i in range(11):
+        if i < 6:  # Primera columna (6 elementos)
             x = ancho // 2 - 520
             y = inicio_y + i * espacio_y
-        else:
+        else:      # Segunda columna (resto)
             x = ancho // 2 + 20
-            y = inicio_y + (i - 5) * espacio_y
+            y = inicio_y + (i - 6) * espacio_y
 
         botones.append(
             Boton(subniveles[i], (x, y), (ancho_boton, alto_boton), fuente_boton,
@@ -104,9 +109,11 @@ def niveles_menu_mundo1(pantalla, ancho, alto):
         6: nivel7,
         7: nivel8,
         8: nivel9,
-        9: nivel10
+        9: nivel10,
+        10: nivel11        # ← AGREGADO
     }
 
+    # --- Loop del menú ---
     while True:
         mouse_pos = pygame.mouse.get_pos()
 
@@ -123,16 +130,19 @@ def niveles_menu_mundo1(pantalla, ancho, alto):
 
         pantalla.blit(fondo, (0, 0))
 
+        # Título
         sombra_titulo = fuente_titulo.render("MUNDO 1", True, (40, 20, 10))
         titulo = fuente_titulo.render("MUNDO 1", True, (255, 230, 180))
         pantalla.blit(sombra_titulo, (ancho//2 - sombra_titulo.get_width()//2 + 3, 63))
         pantalla.blit(titulo, (ancho//2 - titulo.get_width()//2, 60))
 
+        # Subtítulo
         sombra_sub = fuente_subtitulo.render("Interpolación", True, (30, 15, 5))
         subtitulo = fuente_subtitulo.render("Interpolación", True, (255, 210, 150))
         pantalla.blit(sombra_sub, (ancho//2 - sombra_sub.get_width()//2 + 2, 138))
         pantalla.blit(subtitulo, (ancho//2 - subtitulo.get_width()//2, 135))
 
+        # Dibujar botones
         for boton in botones:
             boton.actualizar(mouse_pos)
             boton.dibujar(pantalla)
