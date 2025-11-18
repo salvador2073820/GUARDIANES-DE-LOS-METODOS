@@ -135,32 +135,47 @@ def nivel10(pantalla, ancho, alto):
     MENSAJES_ALEATORIOS = [
         {
             "problema_titulo": "PROBLEMA 1",
-            "titulo": "MÉTODO DE FALSA POSICIÓN",
-            "tabla": [
-                ("a", "b", "f(a)", "f(b)", "c"),
-                ("1", "2", "-2", "4", "1.33"),
-                ("1.33", "2", "-0.3", "4", "1.41")
-            ],
+            "titulo": "MÉTODO FALSA POSICIÓN",
             "texto": [
-                "Usa la última fila para aproximar la raíz"
+                "Usando el método de Falsa Posición para",
+                "f(x)=e^4x - 7",
+                "Contesta lo siguiente:"
             ],
             "inputs": [
-                {"label": "x* =", "correct_answer": "1.41", "placeholder": "Raíz aproximada"}
+                {"label": "Margen de error en  la 12va iteración =", "correct_answer": "0.0042136787", "placeholder": "Respuesta"},
+                {"label": "Valor de a cuando i=10", "correct_answer": "0.457640879", "placeholder": "Respuesta"},
+                {"label": "Valor de f(a) cuando i=14", "correct_answer": "-0.192744668", "placeholder": "Respuesta"},
+                {"label": "Valor de x cuando margen de error = 0.001", "correct_answer": "0.483066368", "placeholder": "Respuesta"}
             ]
         },
         {
             "problema_titulo": "PROBLEMA 2",
-            "titulo": "MÉTODO DE FALSA POSICIÓN",
-            "tabla": [
-                ("a", "b", "c"),
-                ("0", "1", "0.73"),
-                ("0.73", "1", "0.78")
-            ],
+            "titulo": "MÉTODO FALSA POSICIÓN",
             "texto": [
-                "Calcula la mejor aproximación de la raíz"
+                "Usando el método de Falsa Posición para",
+                "f(x)=2x^2 - 6x - 2",
+                "Contesta lo siguiente:"
             ],
             "inputs": [
-                {"label": "x* =", "correct_answer": "0.78", "placeholder": "Raíz aproximada"}
+               {"label": "Margen de error en  la 3ra iteración =", "correct_answer": "0.548472075", "placeholder": "Respuesta"},
+                {"label": "Valor de a cuando i=5", "correct_answer": "-0.297959183", "placeholder": "Respuesta"},
+                {"label": "Valor de f(a) cuando i=2", "correct_answer": "-0.375", "placeholder": "Respuesta"},
+                {"label": "Valor de x cuando margen de error = 0.001", "correct_answer": "-0.302735106", "placeholder": "Respuesta"}
+            ]
+        },
+        {
+            "problema_titulo": "PROBLEMA 3",
+            "titulo": "MÉTODO FALSA POSICIÓN",
+            "texto": [
+                "Usando el método de Falsa Posición para",
+                "f(x)=e^7x - 3/4x",
+                "Contesta lo siguiente:"
+            ],
+            "inputs": [
+               {"label": "Margen de error en  la 5ta iteración =", "correct_answer": "0.0000105776864", "placeholder": "Respuesta"},
+                {"label": "Valor de a cuando i=2", "correct_answer": "5", "placeholder": "Respuesta"},
+                {"label": "Valor de f(a) cuando i=3", "correct_answer": "3.381860134", "placeholder": "Respuesta"},
+                {"label": "Valor de x cuando margen de error = 0.001", "correct_answer": "5.54138125", "placeholder": "Respuesta"}
             ]
         }
     ]
