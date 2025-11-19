@@ -7,11 +7,6 @@ from unidades.unidad3.nivel2 import nivel2
 from unidades.unidad3.nivel3 import nivel3
 from unidades.unidad3.nivel4 import nivel4
 from unidades.unidad3.nivel5 import nivel5
-from unidades.unidad3.nivel6 import nivel6
-from unidades.unidad3.nivel7 import nivel7
-from unidades.unidad3.nivel8 import nivel8
-from unidades.unidad3.nivel9 import nivel9
-from unidades.unidad3.nivel10 import nivel10
 
 pygame.init()
 
@@ -49,16 +44,11 @@ def niveles_menu_mundo3(pantalla, ancho, alto):
     fuente_boton = pygame.font.SysFont("Georgia", 28, bold=True)
     reloj = pygame.time.Clock()
 
-    # --- Subniveles del Mundo 3 ---
+    # --- Subniveles del Mundo 3 (solo primeros 5 con nuevos nombres) ---
     subniveles = [
-        "Línea recta",
-        "Cuadrática",
-        "Cúbica",
-        "Lineal con función",
-        "Cuadrática con función",
         "Regla trapezoidal",
-        "Regla 1/3 Simpson",
-        "Regla 3/8 Simpson",
+        "Regla de 1/3 Simpson",
+        "Regla de 3/8 Simpson",
         "Newton-Cotes Abierta",
         "Newton-Cotes Cerrada"
     ]
@@ -69,12 +59,7 @@ def niveles_menu_mundo3(pantalla, ancho, alto):
         1: nivel2,
         2: nivel3,
         3: nivel4,
-        4: nivel5,
-        5: nivel6,
-        6: nivel7,
-        7: nivel8,
-        8: nivel9,
-        9: nivel10
+        4: nivel5
     }
 
     # --- Colores ---
@@ -87,7 +72,7 @@ def niveles_menu_mundo3(pantalla, ancho, alto):
     fondo = pygame.image.load("assets/images/fondo2.png").convert()
     fondo = pygame.transform.scale(fondo, (ancho, alto))
 
-    # --- Crear botones en dos columnas (5 y 5) ---
+    # --- Crear botones en una sola columna (5 niveles) ---
     botones = []
     espacio_y = 80
     ancho_boton = 540
@@ -95,12 +80,8 @@ def niveles_menu_mundo3(pantalla, ancho, alto):
     inicio_y = 230
 
     for i, nombre in enumerate(subniveles):
-        if i < 5:
-            x = ancho // 2 - ancho_boton - 50      # Columna izquierda
-            y = inicio_y + i * espacio_y
-        else:
-            x = ancho // 2 + 50                    # Columna derecha
-            y = inicio_y + (i - 5) * espacio_y
+        x = ancho // 2 - ancho_boton // 2  # Centrado
+        y = inicio_y + i * espacio_y
 
         botones.append(
             Boton(nombre, (x, y), (ancho_boton, alto_boton), fuente_boton,

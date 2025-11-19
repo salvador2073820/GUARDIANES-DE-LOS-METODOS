@@ -241,15 +241,29 @@ def nivel2(pantalla, ancho, alto):
                                 show_overlay = False
                                 temporizador.detener()
 
+                                # === PANTALLA DE TRANSICIÓN AL NIVEL 3 ===
+                                pantalla.fill((0, 0, 0))  # Fondo negro
+                                
+                                # Mostrar mensaje de transición
+                                mensaje_transicion = fuente.render("¡NIVEL 2 COMPLETADO!", True, (255, 255, 255))
+                                mensaje_continuar = fuente_mensaje.render("Cargando nivel 3...", True, (200, 200, 200))
+                                
+                                pantalla.blit(mensaje_transicion, mensaje_transicion.get_rect(center=(ancho//2, alto//2 - 50)))
+                                pantalla.blit(mensaje_continuar, mensaje_continuar.get_rect(center=(ancho//2, alto//2 + 50)))
+                                pygame.display.flip()
+                                
+                                # Pequeña pausa para mostrar el mensaje
+                                pygame.time.delay(2000)
+
                                 # TRANSICIÓN AL NIVEL 3
                                 try:
                                     from unidades.unidad1.nivel3 import nivel3
                                     # Llamada a nivel3: aquí se realiza la transferencia al siguiente nivel.
                                     nivel3(pantalla, ancho, alto)
-                                    
+                                    return  # Salir del nivel 2 después de completar nivel 3
                                 except Exception as ex:
                                     print("Error al cargar Nivel 3:", ex)
-                                
+                                    return  # Salir si no se puede cargar el nivel 3
 
                             elif check_result is False:
                                 # RESPUESTA INCORRECTA: perder vida y permitir reintento

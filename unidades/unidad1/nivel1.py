@@ -7,6 +7,13 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 from general.jugador import Jugador
 from general.vidas import SistemaVidas
 
+# Importar el nivel 2
+try:
+    from unidades.unidad1.nivel2 import nivel2
+except ImportError:
+    print("Error: No se pudo importar nivel2. Asegúrate de que el archivo existe.")
+    nivel2 = None
+
 # Definición de la función nivel1
 def nivel1(pantalla, ancho, alto):
 
@@ -19,7 +26,7 @@ def nivel1(pantalla, ancho, alto):
         fuente = pygame.font.Font("assets/fonts/Pieces of Eight.ttf", 48)
         fuente_mensaje = pygame.font.Font("assets/fonts/Pieces of Eight.ttf", 32)
         fuente_cuerpo = pygame.font.SysFont("Arial", 26)
-        fuente_temporizador = pygame.font.Font("assets/fonts/Pieces of Eight.ttf", 36)  # Nueva fuente para el temporizador
+        fuente_temporizador = pygame.font.Font("assets/fonts/Pieces of Eight.ttf", 36)
     except FileNotFoundError:
         print("Error: No se encontró la fuente personalizada. Usando fuente por defecto.")
         fuente = pygame.font.SysFont("Arial", 40)
@@ -41,17 +48,15 @@ def nivel1(pantalla, ancho, alto):
     # === Cargar imagen del piso ===
     try:
         piso_img = pygame.image.load("assets/images/piso3.jpg").convert_alpha()
-        # Puedes escalar la imagen del piso si es necesario, por ejemplo:
-        # piso_img = pygame.transform.scale(piso_img, (piso_img.get_width() * 2, piso_img.get_height() * 2))
     except pygame.error:
         print("Error al cargar la imagen del piso. Usando color sólido.")
-        piso_img = None # O puedes crear una superficie de color sólido como fallback
+        piso_img = None
 
     # === Parámetros del mundo ===
     ALTURA_SUELO = 110
     ANCHO_MUNDO_MAXIMO = 5000
 
-    # === Suelo y Plataformas (sin cambios) ===
+    # === Suelo y Plataformas ===
     suelo = pygame.Rect(0, alto - ALTURA_SUELO, ANCHO_MUNDO_MAXIMO, ALTURA_SUELO)
     plataformas = [
         pygame.Rect(400, alto - ALTURA_SUELO - 80, 150, 20),
@@ -66,14 +71,13 @@ def nivel1(pantalla, ancho, alto):
     # === Cargar imagen del portal y crear su Rect ===
     try:
         portal_img = pygame.image.load("assets/images/portalsinfondo.png").convert_alpha()
-        # Escalar el portal para que sea más grande, por ejemplo, 150x200
         PORTAL_WIDTH = 270
         PORTAL_HEIGHT = 360
         portal_img = pygame.transform.scale(portal_img, (PORTAL_WIDTH, PORTAL_HEIGHT))
     except pygame.error:
         print("Error al cargar la imagen del portal. Usando un color de reemplazo.")
         portal_img = pygame.Surface((150, 200), pygame.SRCALPHA)
-        portal_img.fill((100, 50, 200, 200)) # Púrpura semi-transparente como fallback
+        portal_img.fill((100, 50, 200, 200))
 
     # Posición de la meta (ahora el portal)
     meta = pygame.Rect(2300, alto - ALTURA_SUELO - PORTAL_HEIGHT, PORTAL_WIDTH, PORTAL_HEIGHT)
@@ -124,13 +128,13 @@ def nivel1(pantalla, ancho, alto):
     # === Crear instancia del jugador ===
     jugador = Jugador(100, alto - ALTURA_SUELO - 140, ancho, alto)
 
-    # === Sistema de Vidas (ahora usando la clase separada) ===
+    # === Sistema de Vidas ===
     sistema_vidas = SistemaVidas(max_vidas=5, vidas_iniciales=3)
 
     # === Sistema de Temporizador ===
     class Temporizador:
-        def __init__(self, tiempo_total_minutos=20):  # Cambiado a 20 minutos
-            self.tiempo_total_segundos = tiempo_total_minutos * 60  # 20 minutos en segundos
+        def __init__(self, tiempo_total_minutos=20):
+            self.tiempo_total_segundos = tiempo_total_minutos * 60
             self.tiempo_restante = self.tiempo_total_segundos
             self.activo = False
             self.tiempo_inicio = None
@@ -149,7 +153,7 @@ def nivel1(pantalla, ancho, alto):
             
         def actualizar(self):
             if self.activo and self.tiempo_inicio is not None:
-                tiempo_transcurrido = (pygame.time.get_ticks() - self.tiempo_inicio) // 1000  # Convertir a segundos
+                tiempo_transcurrido = (pygame.time.get_ticks() - self.tiempo_inicio) // 1000
                 self.tiempo_restante = max(0, self.tiempo_total_segundos - tiempo_transcurrido)
                 return self.tiempo_restante > 0
             return True
@@ -162,7 +166,7 @@ def nivel1(pantalla, ancho, alto):
         def tiempo_agotado(self):
             return self.tiempo_restante <= 0
 
-    temporizador = Temporizador(20)  # 20 minutos por problema
+    temporizador = Temporizador(20)
 
     # Cámara
     camara_x = 0
@@ -176,6 +180,7 @@ def nivel1(pantalla, ancho, alto):
     show_overlay = False
     vidas_restantes_despues_error = 0
     tiempo_agotado_overlay = False
+    nivel_completado = False  # Nueva variable para controlar la transición
 
     def check_answers(data, inputs):
         TOLERANCE = 1e-6
@@ -219,6 +224,7 @@ def nivel1(pantalla, ancho, alto):
                                 mostrar_mensaje = False
                                 show_overlay = False
                                 temporizador.detener()
+                                nivel_completado = True  # Marcar nivel como completado
                             elif check_result is False:
                                 sistema_vidas.perder_vida()
                                 check_result = None
@@ -226,7 +232,6 @@ def nivel1(pantalla, ancho, alto):
                                 if mensaje_data.get("inputs"):
                                     active_input_label = mensaje_data["inputs"][0]["label"]
                                 show_overlay = False
-                                # Reiniciar temporizador para nuevo intento
                                 temporizador.reiniciar()
                                 temporizador.iniciar()
 
@@ -298,21 +303,40 @@ def nivel1(pantalla, ancho, alto):
                         active_input_label = label
                         break
 
+        # === VERIFICAR SI EL NIVEL ESTÁ COMPLETADO ===
+        if nivel_completado:
+            # Limpiar la pantalla
+            pantalla.fill((0, 0, 0))
+            
+            # Mostrar mensaje de transición
+            mensaje_transicion = fuente.render("¡NIVEL 1 COMPLETADO!", True, (255, 255, 255))
+            mensaje_continuar = fuente_mensaje.render("Cargando nivel 2...", True, (200, 200, 200))
+            
+            pantalla.blit(mensaje_transicion, mensaje_transicion.get_rect(center=(ancho//2, alto//2 - 50)))
+            pantalla.blit(mensaje_continuar, mensaje_continuar.get_rect(center=(ancho//2, alto//2 + 50)))
+            pygame.display.flip()
+            
+            # Pequeña pausa para mostrar el mensaje
+            pygame.time.delay(2000)
+            
+            # Llamar al nivel 2 si está disponible
+            if nivel2:
+                nivel2(pantalla, ancho, alto)
+            else:
+                print("Error: No se pudo cargar el nivel 2")
+            
+            return  # Salir del nivel 1
+
         # ==== Actualización del Jugador ====
         if not mostrar_mensaje:
             keys = pygame.key.get_pressed()
             
-            # Actualizar movimiento y animación del jugador
             jugador.actualizar_movimiento(keys, entidades_colisionables)
             jugador.actualizar_animacion()
-            
-            # Limitar movimiento del jugador dentro del mundo
             jugador.limitar_movimiento(ANCHO_MUNDO_MAXIMO)
-            
-            # Actualizar cámara
             camara_x = max(0, jugador.get_posicion_para_camara() - ancho // 2)
 
-            # === Lógica de colisión con el portal (anteriormente "meta") ===
+            # Colisión con el portal
             if jugador.verificar_colision_portal(meta):
                 mensaje_data = random.choice(MENSAJES_ALEATORIOS)
 
@@ -326,17 +350,14 @@ def nivel1(pantalla, ancho, alto):
                 show_overlay = False
                 mostrar_mensaje = True
                 tiempo_agotado_overlay = False
-                # Iniciar temporizador cuando aparece el problema
                 temporizador.reiniciar()
                 temporizador.iniciar()
-                # Mueve al jugador para que no colisione repetidamente
                 jugador.rect.right = meta.left - 5
 
         # ==== Actualización del Temporizador ====
         if mostrar_mensaje and not show_overlay and not tiempo_agotado_overlay:
             tiempo_valido = temporizador.actualizar()
             if not tiempo_valido and temporizador.tiempo_agotado():
-                # Tiempo agotado - quitar vida
                 sistema_vidas.perder_vida()
                 tiempo_agotado_overlay = True
                 temporizador.detener()
@@ -347,60 +368,51 @@ def nivel1(pantalla, ancho, alto):
             pantalla.blit(fondo, ((i * fondo_ancho) - offset_x, 0))
 
         COLOR_SUELO = (100, 80, 50)
-        
-        # --- NUEVOS COLORES PARA MADERA (Obstáculos/Plataformas) ---
-        COLOR_MADERA_OSCURA = (101, 67, 33) # Café oscuro, para el borde
-        COLOR_MADERA_CLARA = (139, 90, 43) # Café medio, para la superficie
+        COLOR_MADERA_OSCURA = (101, 67, 33)
+        COLOR_MADERA_CLARA = (139, 90, 43)
 
-        # === Dibujar la imagen del piso en lugar del rectángulo de color ===
+        # Dibujar piso
         if piso_img:
             num_tiles = (suelo.width // piso_img.get_width()) + 1
             for i in range(num_tiles):
                 pantalla.blit(piso_img, (suelo.x - camara_x + i * piso_img.get_width(), suelo.y))
         else:
-            # Fallback a color sólido si la imagen no se cargó
             pygame.draw.rect(pantalla, COLOR_SUELO, pygame.Rect(suelo.x - camara_x, suelo.y, suelo.width, suelo.height))
 
-        # --- DIBUJAR PLATAFORMAS CON ASPECTO DE MADERA VIEJA ---
+        # Dibujar plataformas
         for p in plataformas:
-            # 1. Dibujar la superficie de la plataforma (relleno) con esquinas redondeadas
             pygame.draw.rect(pantalla, COLOR_MADERA_CLARA, pygame.Rect(p.x - camara_x, p.y, p.width, p.height), border_radius=5)
-            # 2. Dibujar el borde oscuro (width=3) para el aspecto de "madera vieja"
             pygame.draw.rect(pantalla, COLOR_MADERA_OSCURA, pygame.Rect(p.x - camara_x, p.y, p.width, p.height), border_radius=5, width=3)
 
-        # === Dibujar el portal en lugar del rectángulo amarillo ===
+        # Dibujar portal
         pantalla.blit(portal_img, (meta.x - camara_x, meta.y))
 
-        # === Dibujar el Jugador ===
+        # Dibujar jugador
         jugador.dibujar(pantalla, camara_x)
 
         texto = fuente.render("NIVEL 1", True, (255, 255, 255))
         pantalla.blit(texto, (20, 20))
 
-        # === Dibujar vidas usando el sistema separado ===
         sistema_vidas.dibujar(pantalla, ancho)
 
+        # Resto del código de dibujo de mensajes y overlays...
         if mostrar_mensaje and mensaje_data:
-            # === Dibujar Temporizador (centrado en la parte superior) - AHORA DENTRO DEL CUADRO ===
             if not show_overlay and not tiempo_agotado_overlay:
                 tiempo_texto = temporizador.obtener_tiempo_formateado()
                 
-                # Cambiar color según el tiempo restante (ajustado para 20 min)
-                if temporizador.tiempo_restante <= 300:  # 5 minutos o menos
-                    color_tiempo = (255, 0, 0)  # Rojo
-                elif temporizador.tiempo_restante <= 600:  # 10 minutos o menos (ajustado para 20 min total)
-                    color_tiempo = (255, 165, 0)  # Naranja
+                if temporizador.tiempo_restante <= 300:
+                    color_tiempo = (255, 0, 0)
+                elif temporizador.tiempo_restante <= 600:
+                    color_tiempo = (255, 165, 0)
                 else:
-                    color_tiempo = (255, 255, 255)  # Blanco
+                    color_tiempo = (255, 255, 255)
                 
                 tiempo_surface = fuente_temporizador.render(tiempo_texto, True, color_tiempo)
                 tiempo_rect = tiempo_surface.get_rect(center=(ancho // 2, 50))
                 
-                # Fondo semitransparente para el temporizador
                 fondo_tiempo = pygame.Surface((tiempo_surface.get_width() + 20, tiempo_surface.get_height() + 10), pygame.SRCALPHA)
                 fondo_tiempo.fill((0, 0, 0, 150))
                 pantalla.blit(fondo_tiempo, (tiempo_rect.x - 10, tiempo_rect.y - 5))
-                
                 pantalla.blit(tiempo_surface, tiempo_rect)
 
             s = pygame.Surface((ancho, alto), pygame.SRCALPHA)

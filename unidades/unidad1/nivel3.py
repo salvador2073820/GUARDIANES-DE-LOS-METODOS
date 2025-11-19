@@ -176,6 +176,9 @@ def nivel3(pantalla, ancho, alto):
     # Contador de fallos para el PROBLEMA ACTUAL: si llega a 3 -> reiniciar nivel
     fallos_en_problema_actual = 0
 
+    # Variables para almacenar las posiciones de los inputs
+    input_rects = {}
+
     def check_answers(data, inputs):
         TOLERANCE = 1e-6
         for spec in data.get("inputs", []):
@@ -199,7 +202,7 @@ def nivel3(pantalla, ancho, alto):
         nonlocal jugador, sistema_vidas, temporizador, camara_x
         nonlocal mostrar_mensaje, mensaje_data, input_texts, active_input_label
         nonlocal check_result, show_overlay, vidas_restantes_despues_error, tiempo_agotado_overlay
-        nonlocal fallos_en_problema_actual
+        nonlocal fallos_en_problema_actual, input_rects
 
         # Reinstanciar jugador y vidas
         jugador = Jugador(100, alto - ALTURA_SUELO - 140, ancho, alto)
@@ -217,6 +220,7 @@ def nivel3(pantalla, ancho, alto):
         vidas_restantes_despues_error = 0
         tiempo_agotado_overlay = False
         fallos_en_problema_actual = 0
+        input_rects = {}
 
     
     while True:
@@ -242,18 +246,32 @@ def nivel3(pantalla, ancho, alto):
                                 show_overlay = False
                                 temporizador.detener()
 
-                    
+                                # === PANTALLA DE TRANSICIÓN AL NIVEL 4 ===
+                                pantalla.fill((0, 0, 0))  # Fondo negro
+                                
+                                # Mostrar mensaje de transición
+                                mensaje_transicion = fuente.render("¡NIVEL 3 COMPLETADO!", True, (255, 255, 255))
+                                mensaje_continuar = fuente_mensaje.render("Cargando nivel 4...", True, (200, 200, 200))
+                                
+                                pantalla.blit(mensaje_transicion, mensaje_transicion.get_rect(center=(ancho//2, alto//2 - 50)))
+                                pantalla.blit(mensaje_continuar, mensaje_continuar.get_rect(center=(ancho//2, alto//2 + 50)))
+                                pygame.display.flip()
+                                
+                                # Pequeña pausa para mostrar el mensaje
+                                pygame.time.delay(2000)
+
+                                # TRANSICIÓN AL NIVEL 4
                                 try:
                                     from unidades.unidad1.nivel4 import nivel4
                                     # Llamada a nivel4: aquí se realiza la transferencia al siguiente nivel.
                                     nivel4(pantalla, ancho, alto)
-                                    
+                                    return  # Salir del nivel 3 después de completar nivel 4
                                 except Exception as ex:
                                     print("Error al cargar Nivel 4:", ex)
-                            
+                                    return  # Salir si no se puede cargar el nivel 4
 
                             elif check_result is False:
-                                
+                                # RESPUESTA INCORRECTA: perder vida y permitir reintento
                                 sistema_vidas.perder_vida()
                                 fallos_en_problema_actual += 1
                                 check_result = None
@@ -265,10 +283,11 @@ def nivel3(pantalla, ancho, alto):
                                 temporizador.iniciar()
 
                                 if fallos_en_problema_actual >= 3:
-                            
+                                    # Reiniciar nivel después de 3 fallos
                                     reiniciar_nivel()
                             continue
 
+                    # Si se está respondiendo (inputs)
                     if mensaje_data and mensaje_data.get("inputs"):
                         if e.unicode.isdigit() or e.unicode in ".-":
                             if active_input_label and len(input_texts[active_input_label]) < 40:
@@ -276,13 +295,14 @@ def nivel3(pantalla, ancho, alto):
                         elif e.key == pygame.K_BACKSPACE:
                             if active_input_label:
                                 input_texts[active_input_label] = input_texts[active_input_label][:-1]
-                        elif e.key in (pygame.K_TAB, pygame.K_UP, pygame.K_DOWN):
+                        elif e.key in (pygame.K_TAB, pygame.K_UP, pygame.K_DOWN, pygame.K_RIGHT, pygame.K_LEFT):
+                            # Navegación entre inputs con TAB, flechas arriba/abajo y derecha/izquierda
                             labels = [i['label'] for i in mensaje_data["inputs"]]
                             if active_input_label in labels:
                                 i = labels.index(active_input_label)
-                                if e.key in (pygame.K_TAB, pygame.K_DOWN):
+                                if e.key in (pygame.K_TAB, pygame.K_DOWN, pygame.K_RIGHT):
                                     active_input_label = labels[(i + 1) % len(labels)]
-                                else:
+                                else:  # K_UP o K_LEFT
                                     active_input_label = labels[(i - 1) % len(labels)]
                         elif e.key in (pygame.K_RETURN, pygame.K_SPACE):
                             check_result = check_answers(mensaje_data, input_texts)
@@ -298,25 +318,10 @@ def nivel3(pantalla, ancho, alto):
 
             if e.type == pygame.MOUSEBUTTONDOWN and mostrar_mensaje and mensaje_data and mensaje_data.get("inputs") and not show_overlay:
                 mouse_x, mouse_y = e.pos
-
-                cuadro_ancho = ancho * 0.85
-                cuadro_alto = alto * 0.75
-                cuadro_x = (ancho - cuadro_ancho) // 2
-                cuadro = pygame.Rect(cuadro_x, (alto - cuadro_alto) // 2, cuadro_ancho, cuadro_alto)
-                cuadro_contenido = cuadro.inflate(-30, -30)
-
-                input_y_start = cuadro_contenido.bottom - 150
-                input_height = 40
-                field_width = 300
-
-                for i, spec in enumerate(mensaje_data["inputs"]):
-                    label = spec["label"]
-                    label_surf = fuente_cuerpo.render(label, True, (255, 255, 255))
-                    total_width = label_surf.get_width() + 10 + field_width
-                    input_x = cuadro.centerx - total_width // 2
-                    input_y = input_y_start + i * 50
-                    rect_box = pygame.Rect(input_x + label_surf.get_width() + 10, input_y, field_width, input_height)
-                    if rect_box.collidepoint(mouse_x, mouse_y):
+                
+                # Verificar si se hizo click en alguno de los inputs
+                for label, rect in input_rects.items():
+                    if rect.collidepoint(mouse_x, mouse_y):
                         active_input_label = label
                         break
 
@@ -345,6 +350,8 @@ def nivel3(pantalla, ancho, alto):
                 jugador.rect.right = meta.left - 5
                 # Resetear contador de fallos para este nuevo problema
                 fallos_en_problema_actual = 0
+                # Limpiar rectángulos de inputs
+                input_rects = {}
 
         if mostrar_mensaje and not show_overlay and not tiempo_agotado_overlay:
             tiempo_valido = temporizador.actualizar()
@@ -431,88 +438,82 @@ def nivel3(pantalla, ancho, alto):
             pantalla.blit(titulo_t, titulo_t.get_rect(centerx=cuadro.centerx, top=y_pos))
             y_pos += titulo_t.get_height() + 20
 
-            # Mostrar enunciado (si existe)
+            # Mostrar enunciado
             line_height = fuente_cuerpo.get_height() + 5
-
-            # Primero juntamos las líneas normales (enunciado) y las filas de tabla (si las hay)
-            texto_normal = []
-            tabla_datos = []
-
-            # Si mensaje_data tiene "tabla" predefinida la preferimos; si no, intentamos parsear "texto"
-            if mensaje_data.get("tabla"):
-                tabla_datos = [(str(xi), str(yi)) for xi, yi in mensaje_data["tabla"]]
-            else:
-                for linea in mensaje_data.get("texto", []):
-                    partes = linea.split()
-                    if len(partes) == 2:
-                        try:
-                            float(partes[0]); float(partes[1])
-                            tabla_datos.append((partes[0], partes[1]))
-                            continue
-                        except:
-                            pass
-                    texto_normal.append(linea)
-
-            # Dibujar líneas de texto normal
-            for linea in texto_normal:
+            for linea in mensaje_data.get("texto", []):
                 linea_surf = fuente_cuerpo.render(linea, True, (255, 255, 255))
                 pantalla.blit(linea_surf, linea_surf.get_rect(centerx=cuadro.centerx, top=y_pos))
                 y_pos += line_height
 
+            y_pos += 10  # Espacio adicional antes de la tabla
 
-            if tabla_datos:
-                # Configuración de la tabla: anchura y posición centrada dentro del cuadro
-                tabla_width = 300
-                fila_height = 34
+            # Mostrar tabla de datos si existe
+            if mensaje_data.get("tabla"):
+                tabla_datos = mensaje_data["tabla"]
+                
+                # Configuración de la tabla
+                tabla_width = 400
+                fila_height = 40
                 tabla_x = cuadro_contenido.centerx - tabla_width // 2
-                tabla_y = y_pos + 10
-                tabla_height = (len(tabla_datos) + 1) * fila_height + 8  # +1 para el encabezado
+                tabla_y = y_pos
+                tabla_height = (len(tabla_datos) + 1) * fila_height + 10
 
-                # Fondo y borde de la tabla
-                pygame.draw.rect(pantalla, (40, 40, 40), (tabla_x, tabla_y, tabla_width, tabla_height))
-                pygame.draw.rect(pantalla, (200, 200, 200), (tabla_x, tabla_y, tabla_width, tabla_height), 2)
+                # Fondo de la tabla
+                pygame.draw.rect(pantalla, (40, 40, 40), (tabla_x, tabla_y, tabla_width, tabla_height), border_radius=8)
+                pygame.draw.rect(pantalla, (200, 200, 200), (tabla_x, tabla_y, tabla_width, tabla_height), 2, border_radius=8)
 
-                # Posiciones de columnas 
-                columna_X = tabla_x + 30
-                columna_Y = tabla_x + tabla_width - 120
-
-                # Encabezado
-                encabezado_y = tabla_y + 6
-                encabezado_X = fuente_cuerpo.render("Xi", True, (200, 200, 200))
-                encabezado_Y = fuente_cuerpo.render("Yi", True, (200, 200, 200))
-                pantalla.blit(encabezado_X, (columna_X - encabezado_X.get_width() // 2, encabezado_y))
-                pantalla.blit(encabezado_Y, (columna_Y - encabezado_Y.get_width() // 2, encabezado_y))
+                # Encabezados de la tabla
+                encabezado_y = tabla_y + 8
+                encabezado_xi = fuente_cuerpo.render("Xi", True, (255, 255, 255))
+                encabezado_yi = fuente_cuerpo.render("Yi", True, (255, 255, 255))
+                
+                # Centrar encabezados en sus columnas
+                col_xi_center = tabla_x + tabla_width * 0.25
+                col_yi_center = tabla_x + tabla_width * 0.75
+                
+                pantalla.blit(encabezado_xi, (col_xi_center - encabezado_xi.get_width() // 2, encabezado_y))
+                pantalla.blit(encabezado_yi, (col_yi_center - encabezado_yi.get_width() // 2, encabezado_y))
 
                 # Línea horizontal debajo del encabezado
-                pygame.draw.line(pantalla, (200, 200, 200), (tabla_x + 4, encabezado_y + encabezado_X.get_height() + 8),
-                                 (tabla_x + tabla_width - 4, encabezado_y + encabezado_X.get_height() + 8), 2)
+                pygame.draw.line(pantalla, (200, 200, 200), 
+                                (tabla_x + 10, encabezado_y + encabezado_xi.get_height() + 5),
+                                (tabla_x + tabla_width - 10, encabezado_y + encabezado_xi.get_height() + 5), 2)
 
-                # Línea vertical separadora 
+                # Línea vertical separadora
                 separador_x = tabla_x + tabla_width // 2
-                pygame.draw.line(pantalla, (180, 180, 180), (separador_x, tabla_y + 4), (separador_x, tabla_y + tabla_height - 4), 2)
+                pygame.draw.line(pantalla, (180, 180, 180), 
+                                (separador_x, tabla_y + 10),
+                                (separador_x, tabla_y + tabla_height - 10), 2)
 
-                # Dibujar filas con valores y líneas separadoras
-                fila_y = tabla_y + fila_height
+                # Dibujar filas con datos
+                fila_y = tabla_y + fila_height + 5
                 for i, (xi, yi) in enumerate(tabla_datos):
-                    # Dibujar valores
-                    xi_s = fuente_cuerpo.render(str(xi), True, (255, 255, 255))
-                    yi_s = fuente_cuerpo.render(str(yi), True, (255, 255, 255))
-
-                    pantalla.blit(xi_s, (columna_X - xi_s.get_width() // 2, fila_y + 3))
-                    pantalla.blit(yi_s, (columna_Y - yi_s.get_width() // 2, fila_y + 2))
-
-                
-                    pygame.draw.line(pantalla, (150, 150, 150), (tabla_x + 6, fila_y + fila_height - 8),
-                                     (tabla_x + tabla_width - 6, fila_y + fila_height - 8), 1)
+                    # Renderizar valores
+                    xi_text = fuente_cuerpo.render(f"{xi}", True, (255, 255, 255))
+                    yi_text = fuente_cuerpo.render(f"{yi}", True, (255, 255, 255))
+                    
+                    # Centrar valores en sus columnas
+                    pantalla.blit(xi_text, (col_xi_center - xi_text.get_width() // 2, fila_y))
+                    pantalla.blit(yi_text, (col_yi_center - yi_text.get_width() // 2, fila_y))
+                    
+                    # Línea horizontal entre filas
+                    if i < len(tabla_datos) - 1:
+                        pygame.draw.line(pantalla, (150, 150, 150),
+                                        (tabla_x + 10, fila_y + fila_height - 5),
+                                        (tabla_x + tabla_width - 10, fila_y + fila_height - 5), 1)
+                    
                     fila_y += fila_height
 
-                y_pos = tabla_y + tabla_height + 9
+                y_pos = tabla_y + tabla_height + 20
 
-
+            # Inputs para respuestas
             if mensaje_data.get("inputs"):
                 input_y_start = y_pos
                 input_height = 40
                 field_width = 300
+
+                # Limpiar rectángulos anteriores
+                input_rects = {}
 
                 for i, spec in enumerate(mensaje_data["inputs"]):
                     label = spec["label"]
@@ -533,6 +534,9 @@ def nivel3(pantalla, ancho, alto):
                         field_width,
                         input_height
                     )
+
+                    # Guardar el rectángulo para detección de clicks
+                    input_rects[label] = box_rect
 
                     if active_input_label == label and check_result is None:
                         border_color = (0, 255, 255)
@@ -562,11 +566,15 @@ def nivel3(pantalla, ancho, alto):
                 if not show_overlay:
                     hint = fuente_mensaje.render("Presiona ENTER para verificar", True, (200, 200, 200))
                     pantalla.blit(hint, hint.get_rect(centerx=cuadro.centerx, bottom=cuadro.bottom - 15))
+                    
+                    # Instrucciones de navegación
+                    navegacion = fuente_cuerpo.render("Usa TAB, flechas o haz click para cambiar entre campos", True, (180, 180, 180))
+                    pantalla.blit(navegacion, navegacion.get_rect(centerx=cuadro.centerx, bottom=cuadro.bottom - 45))
             else:
                 hint = fuente_mensaje.render("Presiona ENTER para continuar", True, (200, 200, 200))
                 pantalla.blit(hint, hint.get_rect(centerx=cuadro.centerx, bottom=cuadro.bottom - 15))
 
-        # (tiempo agotado / éxito / fallo) 
+        # Overlay (tiempo agotado / éxito / fallo) 
         if mostrar_mensaje and (show_overlay or tiempo_agotado_overlay):
             s_overlay = pygame.Surface((ancho, alto), pygame.SRCALPHA)
             s_overlay.fill((0, 0, 0, 100))
