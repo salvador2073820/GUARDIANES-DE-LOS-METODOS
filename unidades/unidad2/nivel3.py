@@ -36,7 +36,7 @@ def nivel3(pantalla, ancho, alto):
 
     # === Cargar fondo y escalar a pantalla ===
     try:
-        fondo = pygame.image.load("assets/images/fondonivel3.png").convert()
+        fondo = pygame.image.load("assets/images/fondonivel2.png").convert()
         fondo = pygame.transform.scale(fondo, (ancho, alto))
     except pygame.error:
         print("Error al cargar la imagen de fondo. Usando color sólido.")
@@ -67,6 +67,51 @@ def nivel3(pantalla, ancho, alto):
     ]
 
     entidades_colisionables = [suelo] + plataformas
+
+    # === NUEVO: Obstáculos rojos en movimiento (menos cantidad) ===
+    class ObstaculoMovil:
+        def __init__(self, x, y, ancho, alto, velocidad, rango_movimiento):
+            self.rect = pygame.Rect(x, y, ancho, alto)
+            self.velocidad = velocidad
+            self.rango_movimiento = rango_movimiento
+            self.direccion = 1
+            self.posicion_inicial = x
+            
+        def actualizar(self):
+            self.rect.x += self.velocidad * self.direccion
+            
+            # Cambiar dirección si alcanza los límites del movimiento
+            if self.rect.x > self.posicion_inicial + self.rango_movimiento:
+                self.direccion = -1
+            elif self.rect.x < self.posicion_inicial - self.rango_movimiento:
+                self.direccion = 1
+                
+        def dibujar(self, pantalla, camara_x):
+            pygame.draw.rect(pantalla, (255, 0, 0), 
+                           pygame.Rect(self.rect.x - camara_x, self.rect.y, 
+                                     self.rect.width, self.rect.height))
+            pygame.draw.rect(pantalla, (200, 0, 0), 
+                           pygame.Rect(self.rect.x - camara_x, self.rect.y, 
+                                     self.rect.width, self.rect.height), 2)
+
+    # Crear obstáculos móviles (solo 4 en lugar de muchos)
+    obstaculos_moviles = [
+        ObstaculoMovil(600, alto - ALTURA_SUELO - 40, 40, 40, 3, 200),  # Se mueve horizontalmente en el suelo
+        ObstaculoMovil(1200, alto - ALTURA_SUELO - 180, 40, 40, 2, 150), # Se mueve en plataforma
+        ObstaculoMovil(1700, alto - ALTURA_SUELO - 350, 40, 40, 4, 100), # Se mueve en plataforma alta
+        ObstaculoMovil(900, alto - ALTURA_SUELO - 250, 40, 40, 2, 120),  # Se mueve en plataforma media
+    ]
+
+    # === NUEVO: Elementos amarillos que suman vidas ===
+    elementos_amarillos = [
+        pygame.Rect(300, alto - ALTURA_SUELO - 40, 40, 40),
+        pygame.Rect(1000, alto - ALTURA_SUELO - 40, 40, 40),
+        pygame.Rect(1500, alto - ALTURA_SUELO - 40, 40, 40),
+        pygame.Rect(2200, alto - ALTURA_SUELO - 40, 40, 40),
+        pygame.Rect(750, alto - ALTURA_SUELO - 250, 40, 40),  # En plataforma
+        pygame.Rect(1300, alto - ALTURA_SUELO - 180, 40, 40), # En plataforma
+        pygame.Rect(1900, alto - ALTURA_SUELO - 350, 40, 40), # En plataforma alta
+    ]
 
     # === Cargar imagen del portal y crear su Rect ===
     try:
@@ -195,6 +240,9 @@ def nivel3(pantalla, ancho, alto):
     vidas_restantes_despues_error = 0
     tiempo_agotado_overlay = False
     nivel_completado = False  # Nueva variable para controlar la transición
+
+    # === NUEVO: Listas para controlar elementos recolectados ===
+    elementos_amarillos_recolectados = set()
 
     def check_answers(data, inputs):
         TOLERANCE = 1e-6
@@ -353,6 +401,24 @@ def nivel3(pantalla, ancho, alto):
             jugador.limitar_movimiento(ANCHO_MUNDO_MAXIMO)
             camara_x = max(0, jugador.get_posicion_para_camara() - ancho // 2)
 
+            # === NUEVO: Actualizar obstáculos móviles ===
+            for obstaculo in obstaculos_moviles:
+                obstaculo.actualizar()
+                
+                # Detectar colisión con obstáculos móviles
+                if jugador.rect.colliderect(obstaculo.rect):
+                    sistema_vidas.perder_vida()
+                    # Reposicionar al jugador para evitar colisión continua
+                    jugador.rect.x = obstaculo.rect.x - 50
+                    print("¡Tocaste un obstáculo móvil rojo! -1 vida")
+
+            # === NUEVO: Detectar colisión con elementos amarillos (suman vida) ===
+            for i, elemento in enumerate(elementos_amarillos):
+                if i not in elementos_amarillos_recolectados and jugador.rect.colliderect(elemento):
+                    elementos_amarillos_recolectados.add(i)
+                    sistema_vidas.ganar_vida()
+                    print("¡Encontraste un elemento amarillo! +1 vida")
+
             # Colisión con el portal
             if jugador.verificar_colision_portal(meta):
                 mensaje_data = random.choice(MENSAJES_ALEATORIOS)
@@ -400,6 +466,16 @@ def nivel3(pantalla, ancho, alto):
         for p in plataformas:
             pygame.draw.rect(pantalla, COLOR_MADERA_CLARA, pygame.Rect(p.x - camara_x, p.y, p.width, p.height), border_radius=5)
             pygame.draw.rect(pantalla, COLOR_MADERA_OSCURA, pygame.Rect(p.x - camara_x, p.y, p.width, p.height), border_radius=5, width=3)
+
+        # === NUEVO: Dibujar obstáculos móviles ===
+        for obstaculo in obstaculos_moviles:
+            obstaculo.dibujar(pantalla, camara_x)
+
+        # === NUEVO: Dibujar elementos amarillos (si no han sido recolectados) ===
+        for i, elemento in enumerate(elementos_amarillos):
+            if i not in elementos_amarillos_recolectados:
+                pygame.draw.rect(pantalla, (255, 255, 0), pygame.Rect(elemento.x - camara_x, elemento.y, elemento.width, elemento.height))
+                pygame.draw.rect(pantalla, (200, 200, 0), pygame.Rect(elemento.x - camara_x, elemento.y, elemento.width, elemento.height), 2)
 
         # Dibujar portal
         pantalla.blit(portal_img, (meta.x - camara_x, meta.y))

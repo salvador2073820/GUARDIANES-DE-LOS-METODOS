@@ -66,6 +66,29 @@ def nivel2(pantalla, ancho, alto):
         pygame.Rect(1800, alto - ALTURA_SUELO - 250, 300, 20),
     ]
 
+    # === NUEVO: Obstáculos que quitan vidas (cuadros rojos) ===
+    obstaculos_rojos = [
+        pygame.Rect(600, alto - ALTURA_SUELO - 40, 40, 40),
+        pygame.Rect(900, alto - ALTURA_SUELO - 40, 40, 40),
+        pygame.Rect(1300, alto - ALTURA_SUELO - 40, 40, 40),
+        pygame.Rect(1600, alto - ALTURA_SUELO - 40, 40, 40),
+        pygame.Rect(2000, alto - ALTURA_SUELO - 40, 40, 40),
+        pygame.Rect(500, alto - ALTURA_SUELO - 180, 40, 40),  # En plataforma
+        pygame.Rect(800, alto - ALTURA_SUELO - 250, 40, 40),  # En plataforma
+        pygame.Rect(1900, alto - ALTURA_SUELO - 350, 40, 40), # En plataforma alta
+    ]
+
+    # === NUEVO: Elementos que suman vidas (cuadros amarillos) ===
+    elementos_amarillos = [
+        pygame.Rect(300, alto - ALTURA_SUELO - 40, 40, 40),
+        pygame.Rect(1000, alto - ALTURA_SUELO - 40, 40, 40),
+        pygame.Rect(1500, alto - ALTURA_SUELO - 40, 40, 40),
+        pygame.Rect(2200, alto - ALTURA_SUELO - 40, 40, 40),
+        pygame.Rect(750, alto - ALTURA_SUELO - 250, 40, 40),  # En plataforma
+        pygame.Rect(1200, alto - ALTURA_SUELO - 180, 40, 40), # En plataforma
+        pygame.Rect(1700, alto - ALTURA_SUELO - 350, 40, 40), # En plataforma alta
+    ]
+
     entidades_colisionables = [suelo] + plataformas
 
     # === Cargar imagen del portal y crear su Rect ===
@@ -193,6 +216,10 @@ def nivel2(pantalla, ancho, alto):
     vidas_restantes_despues_error = 0
     tiempo_agotado_overlay = False
     nivel_completado = False  # Nueva variable para controlar la transición
+
+    # === NUEVO: Listas para controlar elementos recolectados ===
+    obstaculos_rojos_recolectados = set()
+    elementos_amarillos_recolectados = set()
 
     def check_answers(data, inputs):
         TOLERANCE = 1e-6
@@ -351,6 +378,20 @@ def nivel2(pantalla, ancho, alto):
             jugador.limitar_movimiento(ANCHO_MUNDO_MAXIMO)
             camara_x = max(0, jugador.get_posicion_para_camara() - ancho // 2)
 
+            # === NUEVO: Detectar colisión con obstáculos rojos (quitan vida) ===
+            for i, obstaculo in enumerate(obstaculos_rojos):
+                if i not in obstaculos_rojos_recolectados and jugador.rect.colliderect(obstaculo):
+                    obstaculos_rojos_recolectados.add(i)
+                    sistema_vidas.perder_vida()
+                    print("¡Tocaste un obstáculo rojo! -1 vida")
+
+            # === NUEVO: Detectar colisión con elementos amarillos (suman vida) ===
+            for i, elemento in enumerate(elementos_amarillos):
+                if i not in elementos_amarillos_recolectados and jugador.rect.colliderect(elemento):
+                    elementos_amarillos_recolectados.add(i)
+                    sistema_vidas.ganar_vida()
+                    print("¡Encontraste un elemento amarillo! +1 vida")
+
             # Colisión con el portal
             if jugador.verificar_colision_portal(meta):
                 mensaje_data = random.choice(MENSAJES_ALEATORIOS)
@@ -398,6 +439,18 @@ def nivel2(pantalla, ancho, alto):
         for p in plataformas:
             pygame.draw.rect(pantalla, COLOR_MADERA_CLARA, pygame.Rect(p.x - camara_x, p.y, p.width, p.height), border_radius=5)
             pygame.draw.rect(pantalla, COLOR_MADERA_OSCURA, pygame.Rect(p.x - camara_x, p.y, p.width, p.height), border_radius=5, width=3)
+
+        # === NUEVO: Dibujar obstáculos rojos (si no han sido recolectados) ===
+        for i, obstaculo in enumerate(obstaculos_rojos):
+            if i not in obstaculos_rojos_recolectados:
+                pygame.draw.rect(pantalla, (255, 0, 0), pygame.Rect(obstaculo.x - camara_x, obstaculo.y, obstaculo.width, obstaculo.height))
+                pygame.draw.rect(pantalla, (200, 0, 0), pygame.Rect(obstaculo.x - camara_x, obstaculo.y, obstaculo.width, obstaculo.height), 2)
+
+        # === NUEVO: Dibujar elementos amarillos (si no han sido recolectados) ===
+        for i, elemento in enumerate(elementos_amarillos):
+            if i not in elementos_amarillos_recolectados:
+                pygame.draw.rect(pantalla, (255, 255, 0), pygame.Rect(elemento.x - camara_x, elemento.y, elemento.width, elemento.height))
+                pygame.draw.rect(pantalla, (200, 200, 0), pygame.Rect(elemento.x - camara_x, elemento.y, elemento.width, elemento.height), 2)
 
         # Dibujar portal
         pantalla.blit(portal_img, (meta.x - camara_x, meta.y))

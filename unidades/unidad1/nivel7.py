@@ -43,7 +43,7 @@ def nivel7(pantalla, ancho, alto):
     suelo = pygame.Rect(0, alto - ALTURA_SUELO, ANCHO_MUNDO_MAXIMO, ALTURA_SUELO)
 
     plataformas = [
-        pygame.Rect(200, alto - ALTURA_SUELO - 180, 260, 25),
+        pygame.Rect(200, alto - ALTURA_SUELO - 100, 260, 25),
         pygame.Rect(700, alto - ALTURA_SUELO - 100, 220, 25),
         pygame.Rect(1100, alto - ALTURA_SUELO - 250, 240, 25),
         pygame.Rect(1500, alto - ALTURA_SUELO - 150, 180, 25),
