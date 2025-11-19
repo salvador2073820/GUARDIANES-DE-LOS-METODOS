@@ -14,7 +14,7 @@ def nivel2(pantalla, ancho, alto):
     pygame.init()
     reloj = pygame.time.Clock()
 
-    # ---------- Fuentes ----------
+    
     try:
         fuente = pygame.font.Font("assets/fonts/Pieces of Eight.ttf", 48)
         fuente_mensaje = pygame.font.Font("assets/fonts/Pieces of Eight.ttf", 32)
@@ -26,7 +26,7 @@ def nivel2(pantalla, ancho, alto):
         fuente_cuerpo = pygame.font.SysFont("Arial", 26)
         fuente_temporizador = pygame.font.SysFont("Arial", 36)
 
-    # ---------- Fondo ----------
+    
     try:
         fondo = pygame.image.load("assets/images/fondoprueba.jpg").convert()
         fondo = pygame.transform.scale(fondo, (ancho, alto))
@@ -35,18 +35,18 @@ def nivel2(pantalla, ancho, alto):
         fondo.fill((135, 206, 235))
     fondo_ancho = fondo.get_width()
 
-    # ---------- Piso ----------
+    
     try:
         piso_img = pygame.image.load("assets/images/piso4.png").convert_alpha()
     except Exception:
         piso_img = None
 
-    # ---------- Mundo ----------
+    
     ALTURA_SUELO = 110
     ANCHO_MUNDO_MAXIMO = 5000
     suelo = pygame.Rect(0, alto - ALTURA_SUELO, ANCHO_MUNDO_MAXIMO, ALTURA_SUELO)
 
-    # ---------- Portal ----------
+    
     try:
         portal_img = pygame.image.load("assets/images/portalsinfondo.png").convert_alpha()
         PORTAL_WIDTH = 270
@@ -56,11 +56,11 @@ def nivel2(pantalla, ancho, alto):
         portal_img = pygame.Surface((150, 200), pygame.SRCALPHA)
         portal_img.fill((100, 50, 200, 200))
 
-    # Meta posicionada hacia el final del nivel (ajustable)
+    
     meta_x = 3600
     meta = pygame.Rect(meta_x, alto - ALTURA_SUELO - PORTAL_HEIGHT, PORTAL_WIDTH, PORTAL_HEIGHT)
 
-    # ---------- Clases ----------
+    
     class Enemigo:
         def __init__(self, x, y, ancho_e=60, alto_e=60, rango=150, velocidad=2):
             self.rect = pygame.Rect(x, y, ancho_e, alto_e)
@@ -112,13 +112,13 @@ def nivel2(pantalla, ancho, alto):
                 return True
             return False
 
-    # ---------- Generador de obstaculos (reacomodado distinto a nivel1) ----------
+    
     def generar_obstaculos():
         plataformas_local = []
         objetos_local = []
         enemigos_local = []
 
-        # Zona de inicio: plataformas cortas y escalonadas
+        
         plataformas_local.extend([
             pygame.Rect(200, alto - ALTURA_SUELO - 60, 160, 18),
             pygame.Rect(420, alto - ALTURA_SUELO - 110, 120, 18),
@@ -128,7 +128,7 @@ def nivel2(pantalla, ancho, alto):
             ObjetoRojo(480, alto - ALTURA_SUELO - 140),
         ])
 
-        # Zona central: pasarela y huecos con obstáculos
+        
         offset_central = 900
         plataformas_local.extend([
             pygame.Rect(offset_central + 40, alto - ALTURA_SUELO - 140, 260, 18),
@@ -142,7 +142,7 @@ def nivel2(pantalla, ancho, alto):
         ])
         enemigos_local.append(Enemigo(offset_central + 520, alto - ALTURA_SUELO - 140, rango=200, velocidad=2))
 
-        # Zona final: plataformas pequeñas y combinación enemigo/objetos
+        
         offset_final = 2200
         plataformas_local.extend([
             pygame.Rect(offset_final + 30, alto - ALTURA_SUELO - 100, 140, 18),
@@ -162,7 +162,7 @@ def nivel2(pantalla, ancho, alto):
     plataformas, objetos_rojos, enemigos = generar_obstaculos()
     entidades_colisionables = [suelo] + plataformas
 
-    # ---------- Problemas (Simpson 1/3) ----------
+    
     MENSAJES_ALEATORIOS = [
         {
             "problema_titulo": "PROBLEMA 1:",
@@ -192,11 +192,11 @@ def nivel2(pantalla, ancho, alto):
         },
     ]
 
-    # ---------- Jugador y Vidas ----------
+    
     jugador = Jugador(100, alto - ALTURA_SUELO - 140, ancho, alto)
     sistema_vidas = SistemaVidas(max_vidas=5, vidas_iniciales=3)
 
-    # ---------- Temporizador ----------
+    
     class Temporizador:
         def __init__(self, tiempo_total_minutos=20):
             self.tiempo_total_segundos = tiempo_total_minutos * 60
@@ -231,9 +231,9 @@ def nivel2(pantalla, ancho, alto):
         def tiempo_agotado(self):
             return self.tiempo_restante <= 0
 
-    temporizador = Temporizador(10)  # tiempo por problema (ajustable)
+    temporizador = Temporizador(40)  
 
-    # ---------- Estado ----------
+    
     camara_x = 0
     mostrar_mensaje = False
     mensaje_data = None
@@ -245,7 +245,7 @@ def nivel2(pantalla, ancho, alto):
     tiempo_agotado_overlay = False
     fallos_en_problema_actual = 0
 
-    # ---------- Util ----------
+    
     def check_answers(data, inputs):
         TOLERANCE = 1e-6
         for spec in data.get("inputs", []):
@@ -290,7 +290,7 @@ def nivel2(pantalla, ancho, alto):
         tiempo_agotado_overlay = False
         fallos_en_problema_actual = 0
 
-    # ---------- Cargar nivel3 (no cerrar pygame) ----------
+    
     def cargar_nivel3():
         try:
             directorio_actual = os.path.dirname(os.path.abspath(__file__))
@@ -313,7 +313,7 @@ def nivel2(pantalla, ancho, alto):
             traceback.print_exc()
             return False
 
-    # ---------- Main loop ----------
+    
     while True:
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
@@ -326,14 +326,14 @@ def nivel2(pantalla, ancho, alto):
                 if mostrar_mensaje:
                     if show_overlay:
                         if e.key in (pygame.K_RETURN, pygame.K_SPACE, pygame.K_ESCAPE):
-                            # Si el jugador ganó (check_result True) -> vida + carga nivel3
+                            
                             if check_result is True:
                                 sistema_vidas.ganar_vida()
                                 mostrar_mensaje = False
                                 show_overlay = False
                                 temporizador.detener()
 
-                                # Mensaje corto en consola y cargar nivel3
+                                
                                 print("[nivel2] Respuesta correcta - vida extra otorgada. Cargando nivel3...")
                                 if cargar_nivel3():
                                     return
@@ -344,7 +344,7 @@ def nivel2(pantalla, ancho, alto):
                                 sistema_vidas.perder_vida()
                                 fallos_en_problema_actual += 1
                                 if sistema_vidas.get_vidas() <= 0:
-                                    # dejar overlay de game over, al ENTER reinicia nivel (manejo abajo)
+                                    
                                     pass
                                 else:
                                     check_result = None
@@ -415,12 +415,12 @@ def nivel2(pantalla, ancho, alto):
                         active_input_label = label
                         break
 
-        # Si no hay mensaje y las vidas son 0 -> reiniciar
+        
         if not mostrar_mensaje and sistema_vidas.get_vidas() <= 0:
             reiniciar_nivel()
             continue
 
-        # Actualización principal
+        
         if not mostrar_mensaje:
             keys = pygame.key.get_pressed()
             jugador.actualizar_movimiento(keys, entidades_colisionables)
@@ -446,7 +446,7 @@ def nivel2(pantalla, ancho, alto):
                     except:
                         pass
 
-            # Entrar al portal -> mostrar problema
+            
             if jugador.verificar_colision_portal(meta):
                 mensaje_data = random.choice(MENSAJES_ALEATORIOS)
                 input_texts = {i["label"]: "" for i in mensaje_data.get("inputs", [])}
@@ -463,7 +463,7 @@ def nivel2(pantalla, ancho, alto):
                 jugador.rect.right = meta.left - 5
                 fallos_en_problema_actual = 0
 
-        # Temporizador durante el overlay de pregunta
+        
         if mostrar_mensaje and not show_overlay and not tiempo_agotado_overlay:
             tiempo_valido = temporizador.actualizar()
             if not tiempo_valido and temporizador.tiempo_agotado():
@@ -471,7 +471,7 @@ def nivel2(pantalla, ancho, alto):
                 tiempo_agotado_overlay = True
                 temporizador.detener()
 
-        # ---------- Dibujado ----------
+        
         offset_x = camara_x % fondo_ancho
         for i in range(-2, (ancho // fondo_ancho) + 3):
             pantalla.blit(fondo, ((i * fondo_ancho) - offset_x, 0))
