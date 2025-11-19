@@ -105,8 +105,8 @@ def nivel1(pantalla, ancho, alto):
                 "h = 0.2"
             ],
             "texto": [
-                "Usa el método de Euler hacia adelante para",
-                "calcular y(0.2) e y(0.4)"
+                "Usa el método de Euler hacia adelante"
+                
             ],
             "inputs": [
                 {"label": "y1 =", "correct_answer": "1.933333333", "placeholder": "y(0.2)"},
@@ -122,8 +122,8 @@ def nivel1(pantalla, ancho, alto):
                 "h = 0.4"
             ],
             "texto": [
-                "Usa el método de Euler hacia adelante para",
-                "calcular y(0.4) e y(0.8)"
+                "Usa el método de Euler hacia adelante",
+                
             ],
             "inputs": [
                 {"label": "y1 =", "correct_answer": "3.866666667", "placeholder": "y(0.4)"},
@@ -139,8 +139,8 @@ def nivel1(pantalla, ancho, alto):
                 "h = 0.6"
             ],
             "texto": [
-                "Usa el método de Euler hacia adelante para",
-                "calcular y(0.6) e y(1.2)"
+                "Usa el método de Euler hacia adelante",
+            
             ],
             "inputs": [
                 {"label": "y1 =", "correct_answer": "5.8", "placeholder": "y(0.6)"},
