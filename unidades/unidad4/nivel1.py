@@ -1,17 +1,20 @@
+# unidades/unidad4/nivel1.py
 import pygame, sys
 import random
 import os
+import importlib
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 from general.jugador import Jugador
 from general.vidas import SistemaVidas
 
 def nivel1(pantalla, ancho, alto):
-    """Nivel 1 del Mundo 4 - Euler Hacia Adelante"""
+    """Nivel 1 del Mundo 4 - Euler Hacia Adelante (corregido: vida extra + cargar nivel2)"""
 
     pygame.init()
     reloj = pygame.time.Clock()
 
+    # ---------- Fuentes ----------
     try:
         fuente = pygame.font.Font("assets/fonts/Pieces of Eight.ttf", 48)
         fuente_mensaje = pygame.font.Font("assets/fonts/Pieces of Eight.ttf", 32)
@@ -23,6 +26,7 @@ def nivel1(pantalla, ancho, alto):
         fuente_cuerpo = pygame.font.SysFont("Arial", 26)
         fuente_temporizador = pygame.font.SysFont("Arial", 36)
 
+    # ---------- Fondo ----------
     try:
         fondo = pygame.image.load("assets/images/fondoprueba2.jpg").convert()
         fondo = pygame.transform.scale(fondo, (ancho, alto))
@@ -36,24 +40,13 @@ def nivel1(pantalla, ancho, alto):
     except pygame.error:
         piso_img = None
 
+    # ---------- Mundo ----------
     ALTURA_SUELO = 110
     ANCHO_MUNDO_MAXIMO = 5200
 
     suelo = pygame.Rect(0, alto - ALTURA_SUELO, ANCHO_MUNDO_MAXIMO, ALTURA_SUELO)
-    plataformas = [
-        pygame.Rect(120, alto - ALTURA_SUELO - 70, 180, 20),
-        pygame.Rect(420, alto - ALTURA_SUELO - 170, 200, 20),
-        pygame.Rect(760, alto - ALTURA_SUELO - 120, 160, 20),
-        pygame.Rect(1080, alto - ALTURA_SUELO - 240, 260, 20),
-        pygame.Rect(1540, alto - ALTURA_SUELO - 90, 140, 20),
-        pygame.Rect(1920, alto - ALTURA_SUELO - 180, 200, 20),
-        pygame.Rect(2350, alto - ALTURA_SUELO - 130, 180, 20),
-        pygame.Rect(2780, alto - ALTURA_SUELO - 260, 220, 20),
-        pygame.Rect(3200, alto - ALTURA_SUELO - 120, 160, 20),
-        pygame.Rect(3600, alto - ALTURA_SUELO - 80, 140, 20),
-    ]
-    entidades_colisionables = [suelo] + plataformas
 
+    
     try:
         portal_img = pygame.image.load("assets/images/portalsinfondo.png").convert_alpha()
         PORTAL_WIDTH = 270
@@ -63,8 +56,11 @@ def nivel1(pantalla, ancho, alto):
         portal_img = pygame.Surface((150, 200), pygame.SRCALPHA)
         portal_img.fill((100, 50, 200, 200))
 
-    meta = pygame.Rect(3200, alto - ALTURA_SUELO - PORTAL_HEIGHT, PORTAL_WIDTH, PORTAL_HEIGHT)
+    # Ajusté la meta a una posición razonable hacia el final del nivel
+    meta_x = 4200
+    meta = pygame.Rect(meta_x, alto - ALTURA_SUELO - PORTAL_HEIGHT, PORTAL_WIDTH, PORTAL_HEIGHT)
 
+    
     class ObjetoRojo:
         def __init__(self, x, y, ancho=40, alto=40):
             self.rect = pygame.Rect(x, y, ancho, alto)
@@ -86,28 +82,107 @@ def nivel1(pantalla, ancho, alto):
                 return True
             return False
 
-    objetos_rojos = [
-        ObjetoRojo(300, alto - ALTURA_SUELO - 40),
-        ObjetoRojo(800, alto - ALTURA_SUELO - 180),
-        ObjetoRojo(1300, alto - ALTURA_SUELO - 40),
-        ObjetoRojo(2000, alto - ALTURA_SUELO - 190),
-        ObjetoRojo(2700, alto - ALTURA_SUELO - 270),
-        ObjetoRojo(3400, alto - ALTURA_SUELO - 40),
-    ]
+    class Enemigo:
+        def __init__(self, x, y, ancho_e=60, alto_e=60, rango=120, velocidad=2):
+            self.rect = pygame.Rect(x, y, ancho_e, alto_e)
+            self.color = (180, 40, 40)
+            self.rango = rango
+            self.velocidad = velocidad
+            self.origen_x = x
+            self.direccion = 1
+            self.vivo = True
+            self.cooldown_hit = 0
 
+        def actualizar(self):
+            if not self.vivo:
+                return
+            self.rect.x += self.velocidad * self.direccion
+            if abs(self.rect.x - self.origen_x) >= self.rango:
+                self.direccion *= -1
+            if self.cooldown_hit > 0:
+                self.cooldown_hit -= 1
+
+        def dibujar(self, surf, camara_x):
+            r = self.rect.move(-camara_x, 0)
+            pygame.draw.rect(surf, self.color, r, border_radius=6)
+
+        def intentar_danar(self, jugador_rect):
+            if self.vivo and self.rect.colliderect(jugador_rect) and self.cooldown_hit == 0:
+                self.cooldown_hit = 60
+                return True
+            return False
+
+    
+    def generar_obstaculos():
+        """
+        Genera plataformas, objetos_rojos y enemigos distribuidos en zonas:
+        - inicio (0-1200)
+        - medio (1200-3000)
+        - final (3000-ANCHO_MUNDO_MAXIMO)
+        Esto facilita ajustar la dificultad por zonas.
+        """
+        plataformas_local = []
+        objetos_local = []
+        enemigos_local = []
+
+        # Zona inicio: plataformas simples para aprender mecánicas
+        inicio_x = 100
+        plataformas_local.extend([
+            pygame.Rect(inicio_x + 20, alto - ALTURA_SUELO - 70, 220, 20),
+            pygame.Rect(inicio_x + 420, alto - ALTURA_SUELO - 140, 180, 20),
+            pygame.Rect(inicio_x + 780, alto - ALTURA_SUELO - 110, 140, 20),
+        ])
+
+        objetos_local.extend([
+            ObjetoRojo(inicio_x + 320, alto - ALTURA_SUELO - 40),
+        ])
+
+        
+        medio_offset = 1400
+        plataformas_local.extend([
+            pygame.Rect(medio_offset + 10, alto - ALTURA_SUELO - 120, 300, 20),
+            pygame.Rect(medio_offset + 380, alto - ALTURA_SUELO - 200, 200, 20),
+            pygame.Rect(medio_offset + 700, alto - ALTURA_SUELO - 100, 160, 20),
+            pygame.Rect(medio_offset + 980, alto - ALTURA_SUELO - 150, 140, 20),
+        ])
+
+        objetos_local.extend([
+            ObjetoRojo(medio_offset + 200, alto - ALTURA_SUELO - 40),
+            ObjetoRojo(medio_offset + 820, alto - ALTURA_SUELO - 40),
+        ])
+
+        enemigos_local.append(Enemigo(medio_offset + 500, alto - ALTURA_SUELO - 140, rango=180, velocidad=2))
+
+        
+        final_offset = 3000
+        plataformas_local.extend([
+            pygame.Rect(final_offset + 50, alto - ALTURA_SUELO - 90, 180, 20),
+            pygame.Rect(final_offset + 320, alto - ALTURA_SUELO - 180, 160, 20),
+            pygame.Rect(final_offset + 580, alto - ALTURA_SUELO - 230, 220, 20),
+            pygame.Rect(final_offset + 920, alto - ALTURA_SUELO - 120, 140, 20),
+        ])
+
+        objetos_local.extend([
+            ObjetoRojo(final_offset + 180, alto - ALTURA_SUELO - 40),
+            ObjetoRojo(final_offset + 660, alto - ALTURA_SUELO - 40),
+            ObjetoRojo(final_offset + 900, alto - ALTURA_SUELO - 40),
+        ])
+
+        enemigos_local.append(Enemigo(final_offset + 740, alto - ALTURA_SUELO - 160, rango=140, velocidad=3))
+
+        return plataformas_local, objetos_local, enemigos_local
+
+    plataformas, objetos_rojos, enemigos = generar_obstaculos()
+    entidades_colisionables = [suelo] + plataformas
+
+    
     MENSAJES_ALEATORIOS = [
         {
             "problema_titulo": "PROBLEMA 1",
             "titulo": "EULER HACIA ADELANTE",
             "ecuacion": "3y' + 5y + 1 = 0",
-            "condiciones": [
-                "y(0) = 2",
-                "h = 0.2"
-            ],
-            "texto": [
-                "Usa el método de Euler hacia adelante"
-                
-            ],
+            "condiciones": ["y(0) = 2", "h = 0.2"],
+            "texto": ["Usa el método de Euler hacia adelante"],
             "inputs": [
                 {"label": "y1 =", "correct_answer": "1.933333333", "placeholder": "y(0.2)"},
                 {"label": "y2 =", "correct_answer": "1.895555556", "placeholder": "y(0.4)"}
@@ -117,14 +192,8 @@ def nivel1(pantalla, ancho, alto):
             "problema_titulo": "PROBLEMA 2",
             "titulo": "EULER HACIA ADELANTE",
             "ecuacion": "6y' + 10y + 2 = 0",
-            "condiciones": [
-                "y(0) = 4",
-                "h = 0.4"
-            ],
-            "texto": [
-                "Usa el método de Euler hacia adelante",
-                
-            ],
+            "condiciones": ["y(0) = 4", "h = 0.4"],
+            "texto": ["Usa el método de Euler hacia adelante"],
             "inputs": [
                 {"label": "y1 =", "correct_answer": "3.866666667", "placeholder": "y(0.4)"},
                 {"label": "y2 =", "correct_answer": "4.764444445", "placeholder": "y(0.8)"}
@@ -134,14 +203,8 @@ def nivel1(pantalla, ancho, alto):
             "problema_titulo": "PROBLEMA 3",
             "titulo": "EULER HACIA ADELANTE",
             "ecuacion": "9y' + 10y + 3 = 0",
-            "condiciones": [
-                "y(0) = 6",
-                "h = 0.6"
-            ],
-            "texto": [
-                "Usa el método de Euler hacia adelante",
-            
-            ],
+            "condiciones": ["y(0) = 6", "h = 0.6"],
+            "texto": ["Usa el método de Euler hacia adelante"],
             "inputs": [
                 {"label": "y1 =", "correct_answer": "5.8", "placeholder": "y(0.6)"},
                 {"label": "y2 =", "correct_answer": "0.08", "placeholder": "y(1.2)"}
@@ -149,11 +212,13 @@ def nivel1(pantalla, ancho, alto):
         },
     ]
 
+    
     jugador = Jugador(100, alto - ALTURA_SUELO - 140, ancho, alto)
     sistema_vidas = SistemaVidas(max_vidas=5, vidas_iniciales=3)
 
+    
     class Temporizador:
-        def __init__(self, tiempo_total_minutos=20):
+        def __init__(self, tiempo_total_minutos=40):
             self.tiempo_total_segundos = tiempo_total_minutos * 60
             self.tiempo_restante = self.tiempo_total_segundos
             self.activo = False
@@ -186,43 +251,7 @@ def nivel1(pantalla, ancho, alto):
         def tiempo_agotado(self):
             return self.tiempo_restante <= 0
 
-    temporizador = Temporizador(20)
-
-    class Enemigo:
-        def __init__(self, x, y, ancho_e=60, alto_e=60, rango=120, velocidad=2):
-            self.rect = pygame.Rect(x, y, ancho_e, alto_e)
-            self.color = (180, 40, 40)
-            self.rango = rango
-            self.velocidad = velocidad
-            self.origen_x = x
-            self.direccion = 1
-            self.vivo = True
-            self.cooldown_hit = 0
-
-        def actualizar(self):
-            if not self.vivo:
-                return
-            
-            self.rect.x += self.velocidad * self.direccion
-            if abs(self.rect.x - self.origen_x) >= self.rango:
-                self.direccion *= -1
-
-            if self.cooldown_hit > 0:
-                self.cooldown_hit -= 1
-
-        def dibujar(self, surf, camara_x):
-            r = self.rect.move(-camara_x, 0)
-            pygame.draw.rect(surf, self.color, r, border_radius=6)
-
-        def intentar_danar(self, jugador_rect):
-            if self.vivo and self.rect.colliderect(jugador_rect) and self.cooldown_hit == 0:
-                self.cooldown_hit = 60
-                return True
-            return False
-
-    enemigos = [
-        Enemigo(2500, alto - ALTURA_SUELO - 140, rango=120, velocidad=2),
-    ]
+    temporizador = Temporizador(40)  
 
     camara_x = 0
     mostrar_mensaje = False
@@ -234,6 +263,7 @@ def nivel1(pantalla, ancho, alto):
     vidas_restantes_despues_error = 0
     tiempo_agotado_overlay = False
     fallos_en_problema_actual = 0
+
 
     def check_answers(data, inputs):
         TOLERANCE = 1e-6
@@ -259,12 +289,17 @@ def nivel1(pantalla, ancho, alto):
         nonlocal jugador, sistema_vidas, temporizador, camara_x
         nonlocal mostrar_mensaje, mensaje_data, input_texts, active_input_label
         nonlocal check_result, show_overlay, vidas_restantes_despues_error, tiempo_agotado_overlay
-        nonlocal fallos_en_problema_actual
+        nonlocal fallos_en_problema_actual, plataformas, objetos_rojos, enemigos, entidades_colisionables
 
         jugador = Jugador(100, alto - ALTURA_SUELO - 140, ancho, alto)
+        # Reiniciamos vidas a valores iniciales
         sistema_vidas = SistemaVidas(max_vidas=5, vidas_iniciales=3)
         temporizador.reiniciar()
         camara_x = 0
+
+        # Regenerar obstáculos para consistencia
+        plataformas, objetos_rojos, enemigos = generar_obstaculos()
+        entidades_colisionables = [suelo] + plataformas
 
         mostrar_mensaje = False
         mensaje_data = None
@@ -276,54 +311,113 @@ def nivel1(pantalla, ancho, alto):
         tiempo_agotado_overlay = False
         fallos_en_problema_actual = 0
 
+    
+    def cargar_nivel2():
+     
+        try:
+            directorio_actual = os.path.dirname(os.path.abspath(__file__))
+            ruta_nivel2 = os.path.join(directorio_actual, "nivel2.py")
+            print(f"[nivel1] intentando cargar: {ruta_nivel2}")
+
+            if os.path.exists(ruta_nivel2):
+                # Aseguramos que el directorio esté en el path
+                if directorio_actual not in sys.path:
+                    sys.path.append(directorio_actual)
+
+                # Importar/recargar módulo
+                import nivel2
+                importlib.reload(nivel2)
+
+                # Llamar al nivel 2 (no cerramos pygame aquí)
+                nivel2.nivel2(pantalla, ancho, alto)
+                return True
+            else:
+                print(f"[nivel1] nivel2.py no encontrado en: {directorio_actual}")
+                return False
+        except Exception as e:
+            print(f"[nivel1] Error al cargar nivel2: {e}")
+            import traceback
+            traceback.print_exc()
+            return False
+
+    
     while True:
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
                 pygame.quit(); sys.exit()
 
             if e.type == pygame.KEYDOWN:
+                # SALIR del nivel si no está el overlay de resultado
                 if e.key == pygame.K_ESCAPE and not (mostrar_mensaje and show_overlay):
                     return
 
                 if mostrar_mensaje:
+                    
                     if show_overlay:
                         if e.key in (pygame.K_RETURN, pygame.K_SPACE, pygame.K_ESCAPE):
-                            if check_result is False and sistema_vidas.get_vidas() <= 0:
-                                reiniciar_nivel()
-                                continue
-                            
-                            if tiempo_agotado_overlay and sistema_vidas.get_vidas() <= 0:
+                            # Si no hay vidas -> reiniciar
+                            if sistema_vidas.get_vidas() <= 0:
                                 reiniciar_nivel()
                                 continue
 
+                            if tiempo_agotado_overlay:
+                                # Si el tiempo se agotó: retirar overlay y permitir reintento o reinicio
+                                if sistema_vidas.get_vidas() <= 0:
+                                    reiniciar_nivel()
+                                else:
+                                    tiempo_agotado_overlay = False
+                                    show_overlay = False
+                                    input_texts = {i["label"]: "" for i in mensaje_data.get("inputs", [])}
+                                    if mensaje_data.get("inputs"):
+                                        active_input_label = mensaje_data["inputs"][0]["label"]
+                                    temporizador.reiniciar()
+                                    temporizador.iniciar()
+                                continue
+
+                        
                             if check_result is True:
+                                # Dar vida extra
                                 sistema_vidas.ganar_vida()
+                                # Cerrar overlay / mensaje
                                 mostrar_mensaje = False
                                 show_overlay = False
                                 temporizador.detener()
-                                return  # Volver al menú de niveles
 
+                                # Mensaje de consola y cargar nivel 2
+                                print("[nivel1] ¡Respuesta correcta! Ganaste 1 vida. Cargando nivel 2...")
+                                if cargar_nivel2():
+                                    # Si nivel2 se ejecuta, salimos del bucle de este nivel.
+                                    return
+                                else:
+                                    print("[nivel1] No se pudo cargar nivel2.py - volviendo al menú o reiniciando.")
+                                    return
+
+                            
                             elif check_result is False:
                                 sistema_vidas.perder_vida()
                                 fallos_en_problema_actual += 1
-                                check_result = None
-                                input_texts = {i["label"]: "" for i in mensaje_data.get("inputs", [])}
-                                if mensaje_data.get("inputs"):
-                                    active_input_label = mensaje_data["inputs"][0]["label"]
-                                show_overlay = False
-                                temporizador.reiniciar()
-                                temporizador.iniciar()
 
+                                if sistema_vidas.get_vidas() <= 0:
+                                    
+                                    pass
+                                else:
+                                    # Preparar reintento
+                                    check_result = None
+                                    input_texts = {i["label"]: "" for i in mensaje_data.get("inputs", [])}
+                                    if mensaje_data.get("inputs"):
+                                        active_input_label = mensaje_data["inputs"][0]["label"]
+                                    show_overlay = False
+                                    temporizador.reiniciar()
+                                    temporizador.iniciar()
+
+                                # Reiniciar el nivel si falló 3 veces en el mismo problema
                                 if fallos_en_problema_actual >= 3:
                                     reiniciar_nivel()
-                            elif tiempo_agotado_overlay:
-                                tiempo_agotado_overlay = False
-                                mostrar_mensaje = False
-                                temporizador.reiniciar()
-                                temporizador.iniciar()
                             continue
 
+                    # Si aún se están escribiendo inputs dentro del cuadro
                     if mensaje_data and mensaje_data.get("inputs"):
+                        # Solo aceptar caracteres numéricos y signos básicos
                         if e.unicode.isdigit() or e.unicode in ".-,":
                             if active_input_label and len(input_texts[active_input_label]) < 40:
                                 input_texts[active_input_label] += e.unicode
@@ -339,17 +433,20 @@ def nivel1(pantalla, ancho, alto):
                                 else:
                                     active_input_label = labels[(i - 1) % len(labels)]
                         elif e.key in (pygame.K_RETURN, pygame.K_SPACE):
+                            
                             check_result = check_answers(mensaje_data, input_texts)
                             if check_result is False:
                                 vidas_restantes_despues_error = sistema_vidas.get_vidas()
                             show_overlay = True
                             temporizador.detener()
                     else:
+                        
                         if e.key in (pygame.K_RETURN, pygame.K_SPACE):
                             mostrar_mensaje = False
                             temporizador.detener()
                     continue
 
+            
             if e.type == pygame.MOUSEBUTTONDOWN and mostrar_mensaje and mensaje_data and mensaje_data.get("inputs") and not show_overlay:
                 mouse_x, mouse_y = e.pos
                 cuadro_ancho = min(ancho * 0.95, 1000)
@@ -373,22 +470,25 @@ def nivel1(pantalla, ancho, alto):
                     input_y = start_y + i * (input_height + spacing)
 
                     box_rect = pygame.Rect(input_x + label_surf.get_width() + 20, input_y, field_width, input_height)
-                    
+
                     if box_rect.collidepoint(mouse_x, mouse_y):
                         active_input_label = label
                         break
 
-        if not mostrar_mensaje:
-            if sistema_vidas.get_vidas() <= 0:
-                reiniciar_nivel()
-                continue
+        
+        if not mostrar_mensaje and sistema_vidas.get_vidas() <= 0:
+            reiniciar_nivel()
+            continue
 
+        
+        if not mostrar_mensaje:
             keys = pygame.key.get_pressed()
             jugador.actualizar_movimiento(keys, entidades_colisionables)
             jugador.actualizar_animacion()
             jugador.limitar_movimiento(ANCHO_MUNDO_MAXIMO)
             camara_x = max(0, jugador.get_posicion_para_camara() - ancho // 2)
 
+            # Actualizar enemigos
             for en in enemigos:
                 en.actualizar()
                 if en.intentar_danar(jugador.rect):
@@ -398,6 +498,7 @@ def nivel1(pantalla, ancho, alto):
                     except:
                         pass
 
+            # Actualizar objetos rojos
             for obj in objetos_rojos:
                 obj.actualizar()
                 if obj.intentar_danar(jugador.rect):
@@ -407,6 +508,7 @@ def nivel1(pantalla, ancho, alto):
                     except:
                         pass
 
+            # Si entra al portal
             if jugador.verificar_colision_portal(meta):
                 mensaje_data = random.choice(MENSAJES_ALEATORIOS)
                 input_texts = {i["label"]: "" for i in mensaje_data.get("inputs", [])}
@@ -420,9 +522,11 @@ def nivel1(pantalla, ancho, alto):
                 tiempo_agotado_overlay = False
                 temporizador.reiniciar()
                 temporizador.iniciar()
+                # Colocar al jugador justo antes del portal para evitar re-trigger
                 jugador.rect.right = meta.left - 5
                 fallos_en_problema_actual = 0
 
+        # Si hay un mensaje y el temporizador activo
         if mostrar_mensaje and not show_overlay and not tiempo_agotado_overlay:
             tiempo_valido = temporizador.actualizar()
             if not tiempo_valido and temporizador.tiempo_agotado():
@@ -430,6 +534,7 @@ def nivel1(pantalla, ancho, alto):
                 tiempo_agotado_overlay = True
                 temporizador.detener()
 
+        
         offset_x = camara_x % fondo_ancho
         for i in range(-2, (ancho // fondo_ancho) + 3):
             pantalla.blit(fondo, ((i * fondo_ancho) - offset_x, 0))
@@ -438,6 +543,7 @@ def nivel1(pantalla, ancho, alto):
         COLOR_MADERA_OSCURA = (101, 67, 33)
         COLOR_MADERA_CLARA = (139, 90, 43)
 
+        # Piso
         if piso_img:
             num_tiles = (suelo.width // piso_img.get_width()) + 1
             for i in range(num_tiles):
@@ -445,25 +551,32 @@ def nivel1(pantalla, ancho, alto):
         else:
             pygame.draw.rect(pantalla, COLOR_SUELO, pygame.Rect(suelo.x - camara_x, suelo.y, suelo.width, suelo.height))
 
+        # Plataformas 
         for p in plataformas:
             pygame.draw.rect(pantalla, COLOR_MADERA_CLARA, pygame.Rect(p.x - camara_x, p.y, p.width, p.height), border_radius=6)
             pygame.draw.rect(pantalla, COLOR_MADERA_OSCURA, pygame.Rect(p.x - camara_x, p.y, p.width, p.height), border_radius=6, width=3)
 
+        # Portal
         pantalla.blit(portal_img, (meta.x - camara_x, meta.y))
 
+        # Enemigos y objetos
         for en in enemigos:
             en.dibujar(pantalla, camara_x)
 
         for obj in objetos_rojos:
             obj.dibujar(pantalla, camara_x)
 
+        # Jugador
         jugador.dibujar(pantalla, camara_x)
 
+        # HUD
         texto = fuente.render("MUNDO 4 - NIVEL 1", True, (255, 255, 255))
         pantalla.blit(texto, (20, 20))
         sistema_vidas.dibujar(pantalla, ancho)
 
+        
         if mostrar_mensaje and mensaje_data:
+            # Temporizador del overlay 
             if not show_overlay and not tiempo_agotado_overlay:
                 tiempo_texto = temporizador.obtener_tiempo_formateado()
                 if temporizador.tiempo_restante <= 300:
@@ -479,6 +592,7 @@ def nivel1(pantalla, ancho, alto):
                 pantalla.blit(fondo_tiempo, (tiempo_rect.x - 10, tiempo_rect.y - 5))
                 pantalla.blit(tiempo_surface, tiempo_rect)
 
+            # Fondo oscuro
             s = pygame.Surface((ancho, alto), pygame.SRCALPHA)
             s.fill((0, 0, 0, 180))
             pantalla.blit(s, (0, 0))
@@ -504,7 +618,6 @@ def nivel1(pantalla, ancho, alto):
             y_pos += titulo_t.get_height() + 25
 
             left_x = cuadro_contenido.left + 30
-            right_x = cuadro_contenido.centerx + 20
             content_width = cuadro_contenido.width - 60
 
             ecuacion_surf = fuente_cuerpo.render(mensaje_data["ecuacion"], True, (220, 220, 255))
@@ -523,20 +636,19 @@ def nivel1(pantalla, ancho, alto):
                 pantalla.blit(linea_surf, (left_x, y_pos))
                 y_pos += fuente_cuerpo.get_height() + 8
 
-            y_pos_inputs = y_pos + 30
-
+            # Inputs 
             if mensaje_data.get("inputs"):
                 input_height = 46
                 field_width = 350
                 spacing = 15
-                
+
                 total_inputs_height = len(mensaje_data["inputs"]) * (input_height + spacing) - spacing
                 start_y = cuadro_contenido.bottom - total_inputs_height - 40
 
                 for i, spec in enumerate(mensaje_data["inputs"]):
                     label = spec["label"]
                     placeholder = spec.get("placeholder", "")
-                    
+
                     label_surf = fuente_cuerpo.render(label, True, (255, 255, 255))
                     total_width = label_surf.get_width() + 20 + field_width
                     input_x = cuadro_contenido.centerx - total_width // 2
@@ -575,7 +687,7 @@ def nivel1(pantalla, ancho, alto):
                         while fuente_cuerpo.render(temp_text + "...", True, color_texto).get_width() > field_width - 20 and len(temp_text) > 1:
                             temp_text = temp_text[:-1]
                         text_surf = fuente_cuerpo.render(temp_text + "...", True, color_texto)
-                    
+
                     pantalla.blit(text_surf, (box_rect.x + 10, box_rect.y + (input_height - text_surf.get_height()) // 2))
 
                     if active_input_label == label and not show_overlay:
@@ -591,6 +703,7 @@ def nivel1(pantalla, ancho, alto):
                 hint = fuente_mensaje.render("Presiona ENTER para continuar", True, (200, 200, 200))
                 pantalla.blit(hint, hint.get_rect(centerx=cuadro.centerx, bottom=cuadro.bottom - 18))
 
+    
         if mostrar_mensaje and (show_overlay or tiempo_agotado_overlay):
             s_overlay = pygame.Surface((ancho, alto), pygame.SRCALPHA)
             s_overlay.fill((0, 0, 0, 100))
@@ -614,7 +727,7 @@ def nivel1(pantalla, ancho, alto):
                 color_fondo = (50, 200, 50)
                 color_texto = (255, 255, 255)
                 mensaje_principal = "¡FELICIDADES! Respuesta correcta"
-                mensaje_hint = "Presiona ENTER para continuar"
+                mensaje_hint = "Presiona ENTER para continuar al NIVEL 2"
             else:
                 color_fondo = (200, 50, 50)
                 color_texto = (255, 255, 255)
@@ -639,6 +752,7 @@ def nivel1(pantalla, ancho, alto):
 
         pygame.display.flip()
         reloj.tick(60)
+
 
 if __name__ == '__main__':
     pygame.init()
