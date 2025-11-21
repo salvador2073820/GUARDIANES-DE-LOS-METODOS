@@ -111,19 +111,14 @@ def nivel3(pantalla, ancho, alto):
                 return True
             return False
 
-    # ---------- Obstáculos (diseño nuevo, estratégico) ----------
+    # ---------- Obstáculos ----------
     def generar_obstaculos():
-        """
-        Nivel 3: distribución distinta a nivel 1.
-        - Zona inicio: pequeños escalones y un enemigo sencillo.
-        - Zona media: zig–zag de plataformas con objetos rojos.
-        - Zona final: subida hacia el portal con más riesgo pero cruzable.
-        """
+        
         plataformas_local = []
         objetos_local = []
         enemigos_local = []
 
-        # Zona inicio (0 - ~1400): escalones para calentar
+        # Zona inicio (0 - ~1400): 
         inicio_offset = 100
         plataformas_local.extend([
             pygame.Rect(inicio_offset + 80, alto - ALTURA_SUELO - 90, 220, 20),
@@ -141,7 +136,7 @@ def nivel3(pantalla, ancho, alto):
             Enemigo(inicio_offset + 650, alto - ALTURA_SUELO - 150, rango=160, velocidad=2)
         )
 
-        # Zona media (~1500 - ~3000): zig–zag más técnico
+        # Zona media (~1500 - ~3000):
         medio_offset = 1600
         plataformas_local.extend([
             pygame.Rect(medio_offset + 0,   alto - ALTURA_SUELO - 130, 260, 20),
@@ -164,7 +159,7 @@ def nivel3(pantalla, ancho, alto):
             Enemigo(medio_offset + 1100, alto - ALTURA_SUELO - 230, rango=160, velocidad=2)
         )
 
-        # Zona final (~3000 - fin): subida hacia el portal
+        # Zona final (~3000 - fin): 
         final_offset = 3100
         plataformas_local.extend([
             pygame.Rect(final_offset + 40,  alto - ALTURA_SUELO - 100, 220, 20),
@@ -189,7 +184,7 @@ def nivel3(pantalla, ancho, alto):
     plataformas, objetos_rojos, enemigos = generar_obstaculos()
     entidades_colisionables = [suelo] + plataformas
 
-    # ---------- Mensajes (tú los puedes cambiar después) ----------
+    # ---------- Problemas----------
     MENSAJES_ALEATORIOS = [
         {
             "problema_titulo": "PROBLEMA 1",
