@@ -551,7 +551,7 @@ def nivel6(pantalla, ancho, alto):
         jugador.dibujar(pantalla, camara_x)
 
         # ---------- HUD ----------
-        texto = fuente.render("MUNDO 4 - NIVEL 6 - RUNGE-KUTTA 4to ORDEN (1/3 Simpson)", True, (255, 255, 255))
+        texto = fuente.render("RUNGE-KUTTA 4to ORDEN (1/3 Simpson)", True, (255, 255, 255))
         pantalla.blit(texto, (20, 20))
         sistema_vidas.dibujar(pantalla, ancho)
 
@@ -739,7 +739,7 @@ if __name__ == '__main__':
     pygame.init()
     ANCHO, ALTO = 1200, 800
     pantalla = pygame.display.set_mode((ANCHO, ALTO))
-    pygame.display.set_caption("MUNDO 4 - NIVEL 6 - RUNGE-KUTTA 4to ORDEN (1/3 de Simpson)")
+    pygame.display.set_caption("NIVEL 6 - RUNGE-KUTTA 4to ORDEN (1/3 de Simpson)")
     nivel6(pantalla, ANCHO, ALTO)
     pygame.quit()
     sys.exit()

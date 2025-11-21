@@ -171,7 +171,7 @@ def nivel3(pantalla, ancho, alto):
             "condiciones": ["Calcula usando Simpson 3/8:", "A = 0", "B = 1", "n = 3"],
             "texto": ["Resuelve la integral y completa:"],
             "inputs": [
-                {"label": "H =", "correct_answer": "0.3333333333", "placeholder": "Paso"},
+                {"label": "h =", "correct_answer": "0.3333333333", "placeholder": "Paso"},
                 {"label": "I =", "correct_answer": "0.5755836277", "placeholder": "Resultado"}
             ]
         },
@@ -182,7 +182,7 @@ def nivel3(pantalla, ancho, alto):
             "condiciones": ["Calcula usando Simpson 3/8:", "A = 0", "B = 1", "n = 3"],
             "texto": ["Resuelve la integral y completa:"],
             "inputs": [
-                {"label": "H =", "correct_answer": "0.3333333333", "placeholder": "Paso"},
+                {"label": "h =", "correct_answer": "0.3333333333", "placeholder": "Paso"},
                 {"label": "I =", "correct_answer": "0.7225580864", "placeholder": "Resultado"}
             ]
         },

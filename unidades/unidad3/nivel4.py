@@ -557,7 +557,7 @@ if __name__ == '__main__':
 
     ANCHO, ALTO = 1200, 800
     pantalla = pygame.display.set_mode((ANCHO, ALTO))
-    pygame.display.set_caption("Nivel de Plataformas - Nivel 4")
+    pygame.display.set_caption("Newon Cotes Abiertas - Nivel 4")
 
     nivel4(pantalla, ANCHO, ALTO)
 

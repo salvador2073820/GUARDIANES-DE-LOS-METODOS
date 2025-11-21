@@ -169,11 +169,11 @@ def nivel2(pantalla, ancho, alto):
             "titulo": "REGLA 1/3 DE SIMPSON",
             "ecuacion": "∫₂³ (1/(1+x²)) dx, n=10",
             "condiciones": ["Calcula usando Simpson 1/3:", "A =", "B =", "H =", "I ="],
-            "texto": ["Resuelve la integral y completa:"],
+
             "inputs": [
-                {"label": "A =", "correct_answer": "2", "placeholder": "Límite inferior"},
-                {"label": "B =", "correct_answer": "3", "placeholder": "Límite superior"},
-                {"label": "H =", "correct_answer": "0.1", "placeholder": "Paso"},
+                {"label": "a =", "correct_answer": "2", "placeholder": "Límite inferior"},
+                {"label": "b =", "correct_answer": "3", "placeholder": "Límite superior"},
+                {"label": "h =", "correct_answer": "0.1", "placeholder": "Paso"},
                 {"label": "I =", "correct_answer": "0.14189715", "placeholder": "Resultado"}
             ]
         },
@@ -182,11 +182,11 @@ def nivel2(pantalla, ancho, alto):
             "titulo": "REGLA 1/3 DE SIMPSON",
             "ecuacion": "∫₀¹ (1-x²) dx, n=4",
             "condiciones": ["Calcula usando Simpson 1/3:", "A =", "B =", "H =", "I ="],
-            "texto": ["Resuelve la integral y completa:"],
+
             "inputs": [
-                {"label": "A =", "correct_answer": "0", "placeholder": "Límite inferior"},
-                {"label": "B =", "correct_answer": "1", "placeholder": "Límite superior"},
-                {"label": "H =", "correct_answer": "0.25", "placeholder": "Paso"},
+                {"label": "a =", "correct_answer": "0", "placeholder": "Límite inferior"},
+                {"label": "b =", "correct_answer": "1", "placeholder": "Límite superior"},
+                {"label": "h =", "correct_answer": "0.25", "placeholder": "Paso"},
                 {"label": "I =", "correct_answer": "0.6666666666", "placeholder": "Resultado"}
             ]
         },

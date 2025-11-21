@@ -109,7 +109,7 @@ def nivel2(pantalla, ancho, alto):
     MENSAJES_ALEATORIOS = [
         {
             "problema_titulo": "PROBLEMA 1",
-            "titulo": "MÉTODO GAUSS-JORDÁN",
+            "titulo": "MÉTODO GAUSS-JORDAN",
             "texto": [
                 "Resuelve el siguiente sistema por método Gauss-Jordán:",
                 "1) 2x + 3y + z = 0",
@@ -126,7 +126,7 @@ def nivel2(pantalla, ancho, alto):
         },
         {
             "problema_titulo": "PROBLEMA 2", 
-            "titulo": "MÉTODO GAUSS-JORDÁN",
+            "titulo": "MÉTODO GAUSS-JORDAN",
             "texto": [
                 "Resuelve el siguiente sistema por método Gauss-Jordán:",
                 "1) 2x + y - 3z = 5",
@@ -143,7 +143,7 @@ def nivel2(pantalla, ancho, alto):
         },
         {
             "problema_titulo": "PROBLEMA 3",
-            "titulo": "MÉTODO GAUSS-JORDÁN", 
+            "titulo": "MÉTODO GAUSS-JORDAN", 
             "texto": [
                 "Resuelve el siguiente sistema por método Gauss-Jordán:",
                 "1) x - y + 3z = 13",

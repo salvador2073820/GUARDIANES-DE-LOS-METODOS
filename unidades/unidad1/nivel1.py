@@ -94,7 +94,7 @@ def nivel1(pantalla, ancho, alto):
             ],
             "inputs": [
                 {"label": "g(x)=", "correct_answer": "1.304007668"},
-                {"label": "E=", "correct_answer": "0.082286693"}
+                {"label": "Margen de error=", "correct_answer": "0.082286693"}
             ]
         },
         {
@@ -107,7 +107,7 @@ def nivel1(pantalla, ancho, alto):
             ],
             "inputs": [
                 {"label": "g(x)=", "correct_answer": "1.354025101"},
-                {"label": "E=", "correct_answer": "0.03226926"}
+                {"label": "Margen de error=", "correct_answer": "0.03226926"}
             ]
         },
         {
@@ -120,7 +120,7 @@ def nivel1(pantalla, ancho, alto):
             ],
             "inputs": [
                 {"label": "g(x)=", "correct_answer": "1.207078434"},
-                {"label": "E=", "correct_answer": "0.1792159268"}
+                {"label": "Margen de error=", "correct_answer": "0.1792159268"}
             ]
         }
     ]

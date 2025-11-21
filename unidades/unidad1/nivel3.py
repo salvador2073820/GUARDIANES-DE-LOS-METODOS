@@ -629,7 +629,7 @@ if __name__ == '__main__':
     pygame.init()
     ANCHO, ALTO = 1200, 800
     pantalla = pygame.display.set_mode((ANCHO, ALTO))
-    pygame.display.set_caption("NIVEL 3")
+    pygame.display.set_caption("NIVEL 3- NEWTON HACIA ATRÁS")
     nivel3(pantalla, ANCHO, ALTO)
     pygame.quit()
     sys.exit()

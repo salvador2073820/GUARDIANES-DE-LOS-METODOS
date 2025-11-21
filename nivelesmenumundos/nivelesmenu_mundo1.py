@@ -58,7 +58,7 @@ def niveles_menu_mundo1(pantalla, ancho, alto):
         "Newton hacia atrás",
         "Newton con diferencias divididas",
         "Lagrange",
-        "Grafico",
+        "Gráfico",
         "Bisectriz",
         "Punto Fijo",
         "Newton – Raphson",

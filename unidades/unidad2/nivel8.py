@@ -84,7 +84,7 @@ def nivel8(pantalla, ancho, alto):
     MENSAJES_ALEATORIOS = [
         {
             "problema_titulo": "PROBLEMA 1",
-            "titulo": "INTERPOLACIÓN POLINOMIAL",
+            "titulo": "CÚBICA",
             "texto": [
                 "Resuelve por interpolación polinomial:",
                 "",
@@ -105,7 +105,7 @@ def nivel8(pantalla, ancho, alto):
         },
         {
             "problema_titulo": "PROBLEMA 2",
-            "titulo": "INTERPOLACIÓN POLINOMIAL",
+            "titulo": "CÚBICA",
             "texto": [
                 "Resuelve por interpolación polinomial:",
                 "",
@@ -614,7 +614,7 @@ if __name__ == '__main__':
 
     ANCHO, ALTO = 1200, 800
     pantalla = pygame.display.set_mode((ANCHO, ALTO))
-    pygame.display.set_caption("Unidad 2 - Nivel 8: Interpolación Polinomial")
+    pygame.display.set_caption("Unidad 2 - Nivel 8: Cúbica")
 
     nivel8(pantalla, ANCHO, ALTO)
 

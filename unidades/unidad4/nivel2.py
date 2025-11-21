@@ -9,7 +9,7 @@ from general.jugador import Jugador
 from general.vidas import SistemaVidas
 
 def nivel2(pantalla, ancho, alto):
-    """Nivel 2 del Mundo 4 - Euler Hacia Atras"""
+    """Nivel 2 del Mundo 4 - Euler Hacia Atrás"""
 
     pygame.init()
     reloj = pygame.time.Clock()
@@ -198,10 +198,10 @@ def nivel2(pantalla, ancho, alto):
     MENSAJES_ALEATORIOS = [
         {
             "problema_titulo": "PROBLEMA 1",
-            "titulo": "MÉTODO EULER HACIA ATRAS",
+            "titulo": "MÉTODO EULER HACIA ATRÁS",
             "ecuacion": "f(t, y) = -10y + 2t",
             "texto": [
-                "Resuelve usando el método de Euler Hacia Atras:",
+                "Resuelve usando el método de Euler Hacia Atrás:",
                 "Datos iniciales:",
                 "y0 = 1, h = 0.1",
                 "",
@@ -214,10 +214,10 @@ def nivel2(pantalla, ancho, alto):
         },
         {
             "problema_titulo": "PROBLEMA 2", 
-            "titulo": "MÉTODO EULER HACIA ATRAS",
+            "titulo": "MÉTODO EULER HACIA ATRÁS",
             "ecuacion": "f(t, y) = y^2 + 1",
             "texto": [
-                "Resuelve usando el método de Euler Hacia Atras:",
+                "Resuelve usando el método de Euler Hacia Atrás:",
                 "Datos iniciales:",
                 "y0 = 0, h = 0.1",
                 "",
@@ -556,7 +556,7 @@ def nivel2(pantalla, ancho, alto):
         jugador.dibujar(pantalla, camara_x)
 
         # ---------- HUD ----------
-        texto = fuente.render("MUNDO 4 - NIVEL 2 - EULER HACIA ATRAS", True, (255, 255, 255))
+        texto = fuente.render("MUNDO 4 - NIVEL 2 - EULER HACIA ATRÁS", True, (255, 255, 255))
         pantalla.blit(texto, (20, 20))
         sistema_vidas.dibujar(pantalla, ancho)
 
