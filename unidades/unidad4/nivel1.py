@@ -9,7 +9,7 @@ from general.jugador import Jugador
 from general.vidas import SistemaVidas
 
 def nivel1(pantalla, ancho, alto):
-    """Nivel 1 del Mundo 4 - Euler Hacia Adelante (corregido: vida extra + cargar nivel2)"""
+    """Nivel 1 del Mundo 4 - Euler Hacia Adelante"""
 
     pygame.init()
     reloj = pygame.time.Clock()
@@ -56,7 +56,7 @@ def nivel1(pantalla, ancho, alto):
         portal_img = pygame.Surface((150, 200), pygame.SRCALPHA)
         portal_img.fill((100, 50, 200, 200))
 
-    # Ajusté la meta a una posición razonable hacia el final del nivel
+    # meta a una posición razonable hacia el final del nivel
     meta_x = 4200
     meta = pygame.Rect(meta_x, alto - ALTURA_SUELO - PORTAL_HEIGHT, PORTAL_WIDTH, PORTAL_HEIGHT)
 
@@ -114,13 +114,7 @@ def nivel1(pantalla, ancho, alto):
 
     
     def generar_obstaculos():
-        """
-        Genera plataformas, objetos_rojos y enemigos distribuidos en zonas:
-        - inicio (0-1200)
-        - medio (1200-3000)
-        - final (3000-ANCHO_MUNDO_MAXIMO)
-        Esto facilita ajustar la dificultad por zonas.
-        """
+       
         plataformas_local = []
         objetos_local = []
         enemigos_local = []
