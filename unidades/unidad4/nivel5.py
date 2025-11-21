@@ -172,11 +172,11 @@ def nivel5(pantalla, ancho, alto):
         final_offset = 3200
 
         plataformas_local.extend([
-            pygame.Rect(final_offset + 60, alto - ALTURA_SUELO - 110, 240, 20),
-            pygame.Rect(final_offset + 430, alto - ALTURA_SUELO - 170, 230, 20),
-            pygame.Rect(final_offset + 780, alto - ALTURA_SUELO - 220, 240, 20),
-            pygame.Rect(final_offset + 1140, alto - ALTURA_SUELO - 180, 270, 20),
-            pygame.Rect(final_offset + 1500, alto - ALTURA_SUELO - 130, 240, 20),
+            pygame.Rect(final_offset + 60, alto - ALTURA_SUELO - 150, 240, 20),
+            pygame.Rect(final_offset + 430, alto - ALTURA_SUELO - 200, 230, 20),
+            pygame.Rect(final_offset + 780, alto - ALTURA_SUELO - 280, 240, 20),
+            pygame.Rect(final_offset + 1140, alto - ALTURA_SUELO - 210, 270, 20),
+            pygame.Rect(final_offset + 1500, alto - ALTURA_SUELO - 170, 240, 20),
         ])
 
         objetos_local.extend([
@@ -186,7 +186,7 @@ def nivel5(pantalla, ancho, alto):
         ])
 
         enemigos_local.append(
-            Enemigo(final_offset + 920, alto - ALTURA_SUELO - 210, rango=150, velocidad=3)
+            Enemigo(final_offset + 1100, alto - ALTURA_SUELO - 260, rango=90, velocidad=5)
         )
 
         return plataformas_local, objetos_local, enemigos_local
@@ -201,7 +201,7 @@ def nivel5(pantalla, ancho, alto):
             "titulo": "RUNGE-KUTTA 3er ORDEN",
             "ecuacion": "y' = (2yt + 1)/ y^2",
            "condiciones": ["y0 = 1, h = 0.25"],
-            "texto": ["Calcula y1, y2 usando el método de Runge-Kutta 2do orden."],
+            "texto": ["Calcula y1, y2 usando el método de Runge-Kutta 3er orden."],
             "inputs": [
                 {"label": "k3 para y1 =", "correct_answer": "0.257939981", "placeholder": "Respuesta"},
                 {"label": "y1 =", "correct_answer": "1.211723276", "placeholder": "Respuesta"},
@@ -214,7 +214,7 @@ def nivel5(pantalla, ancho, alto):
             "titulo": "RUNGE-KUTTA 3er ORDEN",
             "ecuacion": "y' - 5yt + 1 = 0",
            "condiciones": ["y0 = 2, h = 0.2"],
-            "texto": ["Calcula y1, y2 usando el método de Runge-Kutta 2do orden."],
+            "texto": ["Calcula y1, y2 usando el método de Runge-Kutta 3er orden."],
             "inputs": [
                 {"label": "k1 para y1 =", "correct_answer": "-0.2", "placeholder": "Respuesta"},
                 {"label": "y1 =", "correct_answer": "1.999333333", "placeholder": "Respuesta"},
@@ -549,7 +549,7 @@ def nivel5(pantalla, ancho, alto):
         jugador.dibujar(pantalla, camara_x)
 
         # ---------- HUD ----------
-        texto = fuente.render("MUNDO 4 - NIVEL 4 - RUNGE-KUTTA 2do ORDEN", True, (255, 255, 255))
+        texto = fuente.render("MUNDO 4 - NIVEL 5 - RUNGE-KUTTA 3er ORDEN", True, (255, 255, 255))
         pantalla.blit(texto, (20, 20))
         sistema_vidas.dibujar(pantalla, ancho)
 
@@ -737,7 +737,7 @@ if __name__ == '__main__':
     pygame.init()
     ANCHO, ALTO = 1200, 800
     pantalla = pygame.display.set_mode((ANCHO, ALTO))
-    pygame.display.set_caption("MUNDO 5 - NIVEL 5 - RUNGE-KUTTA 3er ORDEN")
+    pygame.display.set_caption("MUNDO 4 - NIVEL 5 - RUNGE-KUTTA 3er ORDEN")
     nivel5(pantalla, ANCHO, ALTO)
     pygame.quit()
     sys.exit()
